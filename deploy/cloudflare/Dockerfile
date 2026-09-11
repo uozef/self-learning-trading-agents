@@ -48,9 +48,21 @@ FROM --platform=${RUNTIME_PLATFORM} ${BASE_IMAGE}
 # Overlay the rebranded assets onto the published runtime. `a+rX,go-w` matches
 # the permissions the base image bakes for /opt/hermes: readable and traversable
 # by the unprivileged `hermes` user, writable only by root.
+#
+# The bundle is deleted before it is replaced. COPY merges into a directory, and
+# vite hashes every chunk filename, so an overlay alone would leave the base
+# image's entire bundle sitting next to the new one — unreferenced by
+# index.html, still carrying the old brand, and still shipped in the image.
+RUN rm -rf /opt/hermes/hermes_cli/web_dist
 COPY --chmod=a+rX,go-w --from=web_build /build/hermes_cli/web_dist/ /opt/hermes/hermes_cli/web_dist/
 COPY --chmod=a+rX,go-w locales/ /opt/hermes/locales/
+
+# The two Python modules the rebrand touches. Only these, not the whole
+# hermes_cli tree: the base image's venv is an editable install of its own
+# source, and wholesale replacement would silently mix this checkout against
+# dependencies resolved for a different commit.
 COPY --chmod=a+rX,go-w hermes_cli/dashboard_auth/login_page.py /opt/hermes/hermes_cli/dashboard_auth/login_page.py
+COPY --chmod=a+rX,go-w hermes_cli/web_server.py /opt/hermes/hermes_cli/web_server.py
 
 # The Worker forwards to this port; Cloudflare gives the container no public
 # ingress of its own.

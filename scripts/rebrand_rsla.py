@@ -28,8 +28,12 @@ TARGETS = (
     "web/index.html",
     "web/src/**/*.ts",
     "web/src/**/*.tsx",
+    # Shared with the desktop app and bundled into the dashboard's chat chunk.
+    "apps/shared/src/**/*.ts",
     "locales/*.yaml",
     "hermes_cli/dashboard_auth/login_page.py",
+    # The one banner line an operator sees in the container log.
+    "hermes_cli/web_server.py",
 )
 
 # ``Hermes Agent`` is the full product name; a bare ``Hermes`` inside a
