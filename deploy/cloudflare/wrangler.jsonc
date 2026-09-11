@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "recursive-self-learning-agents",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+
+  "containers": [
+    {
+      // Build context is the repository root so the image can copy web/,
+      // locales/ and the workspace manifests.
+      "image": "../../deploy/cloudflare/Dockerfile",
+      "image_build_context": "../..",
+      "class_name": "AgentContainer",
+      // The dashboard runs a Python process, a Node TUI for the embedded chat
+      // pane and a Chromium shell for browsing, so it needs real memory.
+      // standard-2: 1 vCPU / 6 GiB / 12 GB disk — the image is ~3 GB unpacked.
+      // Move up to standard-3 or standard-4 if the agent does heavy local work.
+      "instance_type": "standard-2",
+      "max_instances": 5
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [{ "name": "AGENT", "class_name": "AgentContainer" }]
+  },
+
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["AgentContainer"] }],
+
+  "vars": {
+    // "shared" = one agent for the whole deployment.
+    // "per-user" = one isolated container per browser; needs RSLA_GATE_PASSWORD.
+    "RSLA_ISOLATION": "shared"
+  }
+}

@@ -138,7 +138,7 @@ export function exposePluginSDK() {
       useConfirmDelete,
     },
 
-    // Hermes API client
+    // RSLA API client
     api,
     // Raw fetchJSON for plugin-specific JSON endpoints
     fetchJSON,

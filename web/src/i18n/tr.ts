@@ -50,8 +50,8 @@ export const tr: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "Gezintiyi kapat",
     closeModelTools: "Modeli ve araçları kapat",
     footer: {
@@ -120,8 +120,8 @@ export const tr: Translations = {
     starting: "Başlatılıyor",
     startedInBackground: "Arka planda başlatıldı — ilerleme için günlüklere bakın",
     stopped: "Durduruldu",
-    updateHermes: "Hermes'i Güncelle",
-    updatingHermes: "Hermes güncelleniyor…",
+    updateHermes: "RSLA'i Güncelle",
+    updatingHermes: "RSLA güncelleniyor…",
     waitingForOutput: "Çıktı bekleniyor…",
   },
 
@@ -326,7 +326,7 @@ export const tr: Translations = {
     enableRuntime: "Etkinleştir",
     forceReinstall: "Yeniden yüklemeyi zorla (önce mevcut klasörü sil)",
     headline:
-      "Hermes eklentilerini keşfedin, yükleyin, etkinleştirin ve güncelleyin (`hermes plugins` ile eşdeğer).",
+      "RSLA eklentilerini keşfedin, yükleyin, etkinleştirin ve güncelleyin (`hermes plugins` ile eşdeğer).",
     identifierLabel: "Git URL veya owner/repo",
     inactive: "pasif",
     installBtn: "Yükle",
@@ -389,21 +389,21 @@ export const tr: Translations = {
       search: 'Paylaşılan becerileri ara…',
       potential: 'Önerilen katkılar',
       potentialHelp:
-        "Hermes'in kullanım veya anlamlı iyileştirmeye göre yerel olarak nitelendirdiği beceriler. Siz inceleyene kadar hiçbir şey paylaşılmaz.",
+        "RSLA'in kullanım veya anlamlı iyileştirmeye göre yerel olarak nitelendirdiği beceriler. Siz inceleyene kadar hiçbir şey paylaşılmaz.",
       noSuggestions: 'Şu anda hiçbir yerel beceri otomatik nitelendirme kurallarını karşılamıyor.',
       browseLocal: count => `Tüm yerel becerileri görüntüle (${count})`,
       browseLocalHelp:
-        "Manuel seçim, Hermes'in bu becerileri kullandığı veya otomatik olarak nitelendirdiği anlamına gelmez.",
+        "Manuel seçim, RSLA'in bu becerileri kullandığı veya otomatik olarak nitelendirdiği anlamına gelmez.",
       ownerReview: 'Katkı taslaklarınız',
       ownerReviewHelp: 'İncelemenizi bekleyen taslaklar ve kolektif onayı bekleyen gönderimler.',
       noDrafts: 'Etkin katkı taslağı veya gönderimi yok.',
       prepare: 'Katkıyı başlat',
       continueDraft: 'Taslağa devam et',
       localOnly: 'Bu cihazdan paylaşılabilir',
-      qualifiedLocally: 'Hermes bu yerel beceriyi olası bir katkı olarak belirledi.',
+      qualifiedLocally: 'RSLA bu yerel beceriyi olası bir katkı olarak belirledi.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `Kuruluşunuz (${organizationName})` : 'Kuruluşunuz'} tüm ekip üyelerindeki yararlı becerileri otomatik olarak algılamak için tasarlanan Collective Wisdom özelliğini etkinleştirdi. Tebrikler! Hermes ekibiniz için yararlı olabilecek bir beceri algıladı.`,
-      qualificationReturning: 'Hermes ekibiniz için yararlı olabilecek başka bir beceri algıladı.',
+        `${organizationName ? `Kuruluşunuz (${organizationName})` : 'Kuruluşunuz'} tüm ekip üyelerindeki yararlı becerileri otomatik olarak algılamak için tasarlanan Collective Wisdom özelliğini etkinleştirdi. Tebrikler! RSLA ekibiniz için yararlı olabilecek bir beceri algıladı.`,
+      qualificationReturning: 'RSLA ekibiniz için yararlı olabilecek başka bir beceri algıladı.',
       savedLocally: 'Bu cihazda özel bir taslak kayıtlı.',
       reviewExact: 'Ayrıntıları görüntüle',
       draftState: state => {
@@ -447,7 +447,7 @@ export const tr: Translations = {
       refreshingShared: 'Yenileniyor…',
       installReferenceLabel: 'Bağlantıdan veya beceri kimliğinden yükle',
       installReferencePlaceholder: 'Portal bağlantısı, beceri kimliği veya skill-id@vN yapıştırın',
-      installReferenceHelp: 'Hermes tam sürümü doğrular ve yüklemeden önce bir uyumluluk planı gösterir.',
+      installReferenceHelp: 'RSLA tam sürümü doğrular ve yüklemeden önce bir uyumluluk planı gösterir.',
       reviewInstall: 'Yüklemeyi incele',
       planningInstall: 'Doğrulanıyor…',
       updateModeLabel: 'Gelecekteki güncellemeler',
@@ -560,7 +560,7 @@ export const tr: Translations = {
     showValue: "Gerçek değeri göster",
     hideValue: "Değeri gizle",
     customTitle: "Özel Anahtarlar",
-    customHint: ".env dosyanızda saklanan ve Hermes'in tanımadığı rastgele ortam değişkenleri. Bunları beceriler, MCP sunucuları veya kendi araçlarınız için ortam değişkenleri eklemek için kullanın.",
+    customHint: ".env dosyanızda saklanan ve RSLA'in tanımadığı rastgele ortam değişkenleri. Bunları beceriler, MCP sunucuları veya kendi araçlarınız için ortam değişkenleri eklemek için kullanın.",
     customConfigured: "{count} özel anahtar ayarlandı",
     addCustomKey: "Özel anahtar ekle",
     customKeyName: "Değişken adı",
@@ -625,11 +625,11 @@ export const tr: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "Gerçek oturum geçmişinden kazanılan, koleksiyonluk Hermes rozetleri. Bilinen ama henüz tamamlanmamış başarılar Keşfedildi olarak gösterilir; Gizli başarılar ilk eşleşen davranış görünene kadar saklı kalır.",
+        "Gerçek oturum geçmişinden kazanılan, koleksiyonluk RSLA rozetleri. Bilinen ama henüz tamamlanmamış başarılar Keşfedildi olarak gösterilir; Gizli başarılar ilk eşleşen davranış görünene kadar saklı kalır.",
       scan_subtitle:
-        "Hermes oturum geçmişi taranıyor. Büyük geçmişlerde ilk tarama 5–10 saniye sürebilir.",
+        "RSLA oturum geçmişi taranıyor. Büyük geçmişlerde ilk tarama 5–10 saniye sürebilir.",
     },
     actions: {
       rescan: "Yeniden tara",
@@ -644,7 +644,7 @@ export const tr: Translations = {
       highest_tier: "En yüksek kademe",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "En son",
-      latest_hint_empty: "Hermes'i daha çok çalıştır",
+      latest_hint_empty: "RSLA'i daha çok çalıştır",
       none_yet: "Henüz yok",
     },
     state: {
@@ -675,10 +675,10 @@ export const tr: Translations = {
       tiers_header: "Kademeler",
       secret_header: "Gizli başarılar",
       secret_body:
-        "Sırlar, tetikleyicilerini saklı tutar. Hermes ilgili bir sinyal gördüğünde kart Keşfedildi durumuna geçer ve gereksinimini gösterir.",
+        "Sırlar, tetikleyicilerini saklı tutar. RSLA ilgili bir sinyal gördüğünde kart Keşfedildi durumuna geçer ve gereksinimini gösterir.",
       scan_status_header: "Tarama durumu",
       scan_status_body:
-        "Hermes yerel geçmişi bir kez tarıyor; sonra kartlar otomatik olarak görünür. Birkaç saniye sürmesi normaldir, hiçbir şey takılmadı.",
+        "RSLA yerel geçmişi bir kez tarıyor; sonra kartlar otomatik olarak görünür. Birkaç saniye sürmesi normaldir, hiçbir şey takılmadı.",
       what_scanned_header: "Neler taranır",
       what_scanned_body:
         "Oturumlar, araç çağrıları, model meta verileri, hatalar, başarılar ve yerel açılma durumu.",
@@ -725,7 +725,7 @@ export const tr: Translations = {
         "X'te paylaş, yeni sekmede önceden doldurulmuş bir gönderi açar. 1200×630 rozetin eklenmesini istiyorsan önce Görseli kopyala'ya tıkla — X, görseli doğrudan tweet düzenleyiciye yapıştırmana izin verir. PNG indir, dosyayı her yerde kullanmak üzere kaydeder.",
       clipboard_unsupported:
         "Bu tarayıcıda panoya görsel kopyalama desteklenmiyor — bunun yerine İndir'i kullanın.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
   kanban: {

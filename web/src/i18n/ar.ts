@@ -50,8 +50,8 @@ export const ar = defineLocale({
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "إغلاق التنقل",
     closeModelTools: "إغلاق النموذج والأدوات",
     footer: {
@@ -120,8 +120,8 @@ export const ar = defineLocale({
     starting: "قيد البدء",
     startedInBackground: "بدء في الخلفية — تحقق من السجلات للتقدم",
     stopped: "متوقف",
-    updateHermes: "تحديث Hermes",
-    updatingHermes: "جاري تحديث Hermes…",
+    updateHermes: "تحديث RSLA",
+    updatingHermes: "جاري تحديث RSLA…",
     waitingForOutput: "في انتظار الناتج…",
   },
 
@@ -271,7 +271,7 @@ export const ar = defineLocale({
     enableRuntime: "تفعيل",
     forceReinstall: "إعادة تثبيت إجباري (حذف المجلد الموجود أولاً)",
     headline:
-      "اكتشف وثبِّت وفعِّل وحدِّث مكوِّنات Hermes الإضافية (مطابقة `hermes plugins`).",
+      "اكتشف وثبِّت وفعِّل وحدِّث مكوِّنات RSLA الإضافية (مطابقة `hermes plugins`).",
     identifierLabel: "رابط Git أو owner/repo",
     inactive: "غير نشط",
     installBtn: "تثبيت من Git",
@@ -333,20 +333,20 @@ export const ar = defineLocale({
       scanLocal: 'فحص المهارات المحلية',
       search: 'البحث في المهارات المشتركة…',
       potential: 'مساهمات مقترحة',
-      potentialHelp: 'مهارات أهلها Hermes محليًا بناءً على الاستخدام أو التحسينات المهمة. لن تتم مشاركتها قبل مراجعتك.',
+      potentialHelp: 'مهارات أهلها RSLA محليًا بناءً على الاستخدام أو التحسينات المهمة. لن تتم مشاركتها قبل مراجعتك.',
       noSuggestions: 'لا توجد حاليًا مهارات محلية تستوفي قواعد التأهيل التلقائي.',
       browseLocal: count => `عرض كل المهارات المحلية (${count})`,
-      browseLocalHelp: 'الاختيار اليدوي لا يعني أن Hermes استخدم هذه المهارات أو أهلها تلقائيًا.',
+      browseLocalHelp: 'الاختيار اليدوي لا يعني أن RSLA استخدم هذه المهارات أو أهلها تلقائيًا.',
       ownerReview: 'مسودات مساهماتك',
       ownerReviewHelp: 'مسودات تنتظر مراجعتك وطلبات تنتظر موافقة المجموعة.',
       noDrafts: 'لا توجد مسودات أو طلبات مساهمة نشطة.',
       prepare: 'بدء المساهمة',
       continueDraft: 'متابعة المسودة',
       localOnly: 'متاحة للمشاركة من هذا الجهاز',
-      qualifiedLocally: 'حدّد Hermes هذه المهارة المحلية كمساهمة محتملة.',
+      qualifiedLocally: 'حدّد RSLA هذه المهارة المحلية كمساهمة محتملة.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `فعّلت مؤسستك (${organizationName})` : 'فعّلت مؤسستك'} Collective Wisdom، وهي ميزة مصممة لاكتشاف المهارات المفيدة تلقائيًا لدى جميع أعضاء الفريق. تهانينا! اكتشف Hermes مهارة قد تكون مفيدة لفريقك.`,
-      qualificationReturning: 'اكتشف Hermes مهارة أخرى قد تكون مفيدة لفريقك.',
+        `${organizationName ? `فعّلت مؤسستك (${organizationName})` : 'فعّلت مؤسستك'} Collective Wisdom، وهي ميزة مصممة لاكتشاف المهارات المفيدة تلقائيًا لدى جميع أعضاء الفريق. تهانينا! اكتشف RSLA مهارة قد تكون مفيدة لفريقك.`,
+      qualificationReturning: 'اكتشف RSLA مهارة أخرى قد تكون مفيدة لفريقك.',
       savedLocally: 'تم حفظ مسودة خاصة على هذا الجهاز.',
       reviewExact: 'عرض التفاصيل',
       draftState: (state: string) => {
@@ -390,7 +390,7 @@ export const ar = defineLocale({
       refreshingShared: 'جارٍ التحديث…',
       installReferenceLabel: 'التثبيت من رابط أو معرّف مهارة',
       installReferencePlaceholder: 'الصق رابط Portal أو معرّف المهارة أو skill-id@vN',
-      installReferenceHelp: 'يتحقق Hermes من الإصدار الدقيق ويعرض خطة التوافق قبل التثبيت.',
+      installReferenceHelp: 'يتحقق RSLA من الإصدار الدقيق ويعرض خطة التوافق قبل التثبيت.',
       reviewInstall: 'مراجعة التثبيت',
       planningInstall: 'جارٍ التحقق…',
       updateModeLabel: 'التحديثات المستقبلية',
@@ -555,11 +555,11 @@ export const ar = defineLocale({
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "إنجازات Hermes",
+      title: "إنجازات RSLA",
       subtitle:
-        "شارات Hermes قابلة للجمع مكتسبة من سجل الجلسات الفعلي. الإنجازات غير المكتملة المعروفة تُعرض كـ Discovered؛ تبقى الإنجازات السرية مخفية حتى يظهر السلوك المطابق لأول مرة.",
+        "شارات RSLA قابلة للجمع مكتسبة من سجل الجلسات الفعلي. الإنجازات غير المكتملة المعروفة تُعرض كـ Discovered؛ تبقى الإنجازات السرية مخفية حتى يظهر السلوك المطابق لأول مرة.",
       scan_subtitle:
-        "فحص سجل جلسات Hermes. يمكن أن يستغرق الفحص الأول 5–10 ثوانٍ على السجلات الكبيرة.",
+        "فحص سجل جلسات RSLA. يمكن أن يستغرق الفحص الأول 5–10 ثوانٍ على السجلات الكبيرة.",
     },
     actions: {
       rescan: "إعادة الفحص",
@@ -574,7 +574,7 @@ export const ar = defineLocale({
       highest_tier: "أعلى مستوى",
       highest_tier_hint: "نحاس → فضة → ذهب ← ماس → أوليمبي",
       latest: "الأحدث",
-      latest_hint_empty: "شغِّل Hermes أكثر",
+      latest_hint_empty: "شغِّل RSLA أكثر",
       none_yet: "لا توجد بعد",
     },
     state: {
@@ -605,10 +605,10 @@ export const ar = defineLocale({
       tiers_header: "المستويات",
       secret_header: "الإنجازات السرية",
       secret_body:
-        "تخفى الأسرار محددها الدقيق. بمجرد أن ترى Hermes إشارة ذات صلة، تصبح البطاقة مكتشفة وتعرض متطلباتها.",
+        "تخفى الأسرار محددها الدقيق. بمجرد أن ترى RSLA إشارة ذات صلة، تصبح البطاقة مكتشفة وتعرض متطلباتها.",
       scan_status_header: "حالة الفحص",
       scan_status_body:
-        "تُفحص Hermes السجل المحلي مرة واحدة، ثم تظهر البطاقات تلقائيًا. لا يوجد توقف إذا استغرق هذا بضع ثوانٍ.",
+        "تُفحص RSLA السجل المحلي مرة واحدة، ثم تظهر البطاقات تلقائيًا. لا يوجد توقف إذا استغرق هذا بضع ثوانٍ.",
       what_scanned_header: "ما يتم فحصه",
       what_scanned_body:
         "الجلسات، استدعاءات الأدوات، بيانات تعريف النموذج، الأخطاء، الإنجازات، وحالة الفتح المحلية.",
@@ -655,7 +655,7 @@ export const ar = defineLocale({
         "المشاركة على X تفتح منشورًا معدَّلاً مسبقًا في تبويب جديد. انقر نسخ الصورة أولاً إذا أردت شارة الإنجاز 1200×630 مرفقة — يسمح X باللصق مباشرة في مؤلف التغريد. تنزيل PNG يحفظ الملف للاستخدام anywhere.",
       clipboard_unsupported:
         "نسخ صورة الحافظة غير مدعوم في هذا المتصفح — استخدم التنزيل بدلاً من ذلك.",
-      tweet_text: "فتحت للتو {tier_part}\"{name}\" في Hermes Agent ☤"
+      tweet_text: "فتحت للتو {tier_part}\"{name}\" في Recursive Self Learning Agents ☤"
     },
   },
 

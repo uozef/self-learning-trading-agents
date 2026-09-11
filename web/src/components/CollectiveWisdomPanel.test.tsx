@@ -216,7 +216,7 @@ describe('CollectiveWisdomPanel', () => {
     expect(await screen.findByText(/Your organization \(Nous Research\) has enabled Collective Wisdom/)).toBeTruthy()
     expect(screen.getByText('First Skill')).toBeTruthy()
     expect(screen.getByText('A friendly description for people.')).toBeTruthy()
-    expect(screen.getByText(/Hermes detected another skill you created that could be useful to your team/)).toBeTruthy()
+    expect(screen.getByText(/RSLA detected another skill you created that could be useful to your team/)).toBeTruthy()
   })
 
   it('keeps all files local until the final moderation confirmation', async () => {
@@ -361,12 +361,12 @@ describe('CollectiveWisdomPanel', () => {
       target: { value: '# Updated\n' }
     })
     expect(screen.queryByLabelText('Edit skill.manifest.json')).toBeNull()
-    const minimumVersion = screen.getByLabelText('Minimum Hermes version')
+    const minimumVersion = screen.getByLabelText('Minimum RSLA version')
     expect(minimumVersion).toHaveProperty('value', '0.17.0')
-    expect(screen.getByText(/Hermes pre-fills new drafts from this authoring device/)).toBeTruthy()
+    expect(screen.getByText(/RSLA pre-fills new drafts from this authoring device/)).toBeTruthy()
     expect(screen.getByText(/Checked systems are the allowed install targets/)).toBeTruthy()
     fireEvent.change(minimumVersion, { target: { value: '' } })
-    expect(screen.getByText('Minimum Hermes version is required.')).toBeTruthy()
+    expect(screen.getByText('Minimum RSLA version is required.')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Save changes & rescan' })).toHaveProperty('disabled', true)
     fireEvent.change(minimumVersion, { target: { value: '0.17.0' } })
     fireEvent.click(screen.getByRole('checkbox', { name: 'Shell commands' }))

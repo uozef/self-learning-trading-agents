@@ -367,7 +367,7 @@ export function WisdomSystemSpecificationEditor({ value, disabled = false, onCha
   return (
     <div className="space-y-4">
       <p className="border border-border bg-muted/10 p-3 text-[11px] leading-4 text-text-secondary">
-        Hermes pre-fills new drafts from this authoring device and requirements explicitly recorded on the skill.
+        RSLA pre-fills new drafts from this authoring device and requirements explicitly recorded on the skill.
         Review these values before sharing: selected platforms and architectures restrict where teammates can install
         the skill. Clear every selection only when the skill is known to work everywhere.
       </p>
@@ -375,9 +375,9 @@ export function WisdomSystemSpecificationEditor({ value, disabled = false, onCha
         <legend className="px-2 text-xs font-semibold uppercase tracking-wide">Compatibility targets</legend>
         <div>
           <Label htmlFor={`${id}-hermes-version`} className="text-xs font-medium">
-            Minimum Hermes version
+            Minimum RSLA version
           </Label>
-          <p className="mb-2 mt-0.5 text-[11px] text-text-tertiary">Older Hermes installations will be blocked.</p>
+          <p className="mb-2 mt-0.5 text-[11px] text-text-tertiary">Older RSLA installations will be blocked.</p>
           <Input
             id={`${id}-hermes-version`}
             disabled={disabled}
@@ -489,7 +489,7 @@ export function WisdomSystemSpecificationEditor({ value, disabled = false, onCha
           <div>
             <h4 className="text-xs font-medium">Tools</h4>
             <p className="mb-3 mt-0.5 text-[11px] text-text-tertiary">
-              Hermes pre-fills explicit skill requirements and checks whether they are enabled. This manifest can never
+              RSLA pre-fills explicit skill requirements and checks whether they are enabled. This manifest can never
               install them automatically.
             </p>
             <ToolRequirements value={value.tools} disabled={disabled} onChange={tools => update('tools', tools)} />
@@ -497,7 +497,7 @@ export function WisdomSystemSpecificationEditor({ value, disabled = false, onCha
           <div className="border-t border-border pt-4">
             <h4 className="text-xs font-medium">Plugins</h4>
             <p className="mb-3 mt-0.5 text-[11px] text-text-tertiary">
-              Hermes pre-fills explicitly declared plugin IDs. Confirm whether each is required.
+              RSLA pre-fills explicitly declared plugin IDs. Confirm whether each is required.
             </p>
             <PluginRequirements
               value={value.plugins}

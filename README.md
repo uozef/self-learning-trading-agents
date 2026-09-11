@@ -1,3 +1,22 @@
+# Recursive Self Learning Agents
+
+**Recursive Self Learning Agents (RSLA)** is a rebranded fork of
+[Hermes Agent](https://github.com/NousResearch/hermes-agent) by Nous Research,
+MIT licensed. The agent, its learning loop and its dashboard are upstream work;
+this fork changes the product name in the user-facing surfaces and adds a
+one-command deployment that runs the whole thing as an isolated container on
+Cloudflare, reachable from a browser.
+
+- **Deploy it:** [`deploy/cloudflare/README.md`](deploy/cloudflare/README.md)
+- **Rebrand pass:** [`scripts/rebrand_rsla.py`](scripts/rebrand_rsla.py) rewrites
+  display copy only. Module names, `HERMES_*` environment variables, HTTP
+  headers and API routes keep their upstream spelling, because the runtime
+  resolves configuration and imports through them.
+
+Everything below is the upstream README, unchanged.
+
+---
+
 <p align="center">
   <img src="assets/banner.png" alt="Hermes Agent" width="100%">
 </p>

@@ -53,8 +53,8 @@ export const en: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "Close navigation",
     closeModelTools: "Close model and tools",
     footer: {
@@ -132,7 +132,7 @@ export const en: Translations = {
     recentSessions: "Recent Sessions",
     restartGateway: "Restart Gateway",
     restartGatewayConfirmMessage:
-      "This restarts the Hermes gateway process. Connected channels and active sessions will reconnect afterward.",
+      "This restarts the RSLA gateway process. Connected channels and active sessions will reconnect afterward.",
     restartGatewayConfirmTitle: "Restart gateway?",
     restartingGateway: "Restarting gateway…",
     running: "Running",
@@ -141,12 +141,12 @@ export const en: Translations = {
     starting: "Starting",
     startedInBackground: "Started in background — check logs for progress",
     stopped: "Stopped",
-    updateHermes: "Update Hermes",
+    updateHermes: "Update RSLA",
     updateHermesConfirmMessage:
       "This runs hermes update and restarts the gateway when it finishes. Active sessions keep their prompt cache until then.",
     updateHermesConfirmNow: "Update now",
-    updateHermesConfirmTitle: "Update Hermes?",
-    updatingHermes: "Updating Hermes…",
+    updateHermesConfirmTitle: "Update RSLA?",
+    updatingHermes: "Updating RSLA…",
     waitingForOutput: "Waiting for output…",
   },
 
@@ -387,7 +387,7 @@ export const en: Translations = {
     enableRuntime: "Enable",
     forceReinstall: "Force reinstall (delete existing folder first)",
     headline:
-      "Discover, install, enable, and update Hermes plugins (`hermes plugins` parity).",
+      "Discover, install, enable, and update RSLA plugins (`hermes plugins` parity).",
     identifierLabel: "Git URL or owner/repo",
     inactive: "inactive",
     installBtn: "Install",
@@ -423,7 +423,7 @@ export const en: Translations = {
       "Curated, Nous-reviewed plugins pinned to exact commits. Install from here for supply-chain-safe versions.",
     catalogSearchPlaceholder: "Search catalog...",
     catalogEmpty: "No catalog entries match.",
-    catalogEmptyDocsLink: "Learn about Hermes plugins",
+    catalogEmptyDocsLink: "Learn about RSLA plugins",
     catalogInstallBtn: "Install",
     catalogInstalledBadge: "Installed ✓",
     catalogUpdateBtn: "Update available",
@@ -465,20 +465,20 @@ export const en: Translations = {
       search: 'Search shared skills…',
       potential: 'Suggested contributions',
       potentialHelp:
-        'Skills Hermes qualified locally from use or meaningful refinement. Nothing is shared until you review it.',
+        'Skills RSLA qualified locally from use or meaningful refinement. Nothing is shared until you review it.',
       noSuggestions: 'No local skills currently meet the automatic qualification rules.',
       browseLocal: count => `View all local skills (${count})`,
-      browseLocalHelp: 'Manual selection does not mean Hermes used or automatically qualified these skills.',
+      browseLocalHelp: 'Manual selection does not mean RSLA used or automatically qualified these skills.',
       ownerReview: 'Your contribution drafts',
       ownerReviewHelp: 'Drafts awaiting your review and submissions waiting for collective approval.',
       noDrafts: 'No active contribution drafts or submissions.',
       prepare: 'Start contribution',
       continueDraft: 'Continue draft',
       localOnly: 'Available to share from this device',
-      qualifiedLocally: 'Hermes identified this local skill as a possible contribution.',
+      qualifiedLocally: 'RSLA identified this local skill as a possible contribution.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `Your organization (${organizationName})` : 'Your organization'} has enabled Collective Wisdom, a feature designed to automatically detect and share useful skills across all team members. Congratulations! Hermes detected a skill you created that could be useful to your team!`,
-      qualificationReturning: 'Hermes detected another skill you created that could be useful to your team!',
+        `${organizationName ? `Your organization (${organizationName})` : 'Your organization'} has enabled Collective Wisdom, a feature designed to automatically detect and share useful skills across all team members. Congratulations! RSLA detected a skill you created that could be useful to your team!`,
+      qualificationReturning: 'RSLA detected another skill you created that could be useful to your team!',
       savedLocally: 'A private draft is saved on this device.',
       reviewExact: 'View details',
       draftState: state => {
@@ -522,7 +522,7 @@ export const en: Translations = {
       refreshingShared: 'Refreshing…',
       installReferenceLabel: 'Install from link or skill ID',
       installReferencePlaceholder: 'Paste a Portal link, skill ID, or skill-id@vN',
-      installReferenceHelp: 'Hermes verifies the exact version and shows a compatibility plan before installing.',
+      installReferenceHelp: 'RSLA verifies the exact version and shows a compatibility plan before installing.',
       reviewInstall: 'Review install',
       planningInstall: 'Verifying…',
       updateModeLabel: 'Future updates',
@@ -639,7 +639,7 @@ export const en: Translations = {
     showValue: "Show real value",
     hideValue: "Hide value",
     customTitle: "Custom Keys",
-    customHint: "Arbitrary environment variables stored in your .env that Hermes doesn't recognise. Use these to inject env vars for skills, MCP servers, or your own tooling.",
+    customHint: "Arbitrary environment variables stored in your .env that RSLA doesn't recognise. Use these to inject env vars for skills, MCP servers, or your own tooling.",
     customConfigured: "{count} custom key{s} set",
     addCustomKey: "Add a custom key",
     customKeyName: "Variable name",
@@ -710,11 +710,11 @@ export const en: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "Collectible Hermes badges earned from real session history. Known unfinished achievements are shown as Discovered; Secret achievements stay hidden until the first matching behavior appears.",
+        "Collectible RSLA badges earned from real session history. Known unfinished achievements are shown as Discovered; Secret achievements stay hidden until the first matching behavior appears.",
       scan_subtitle:
-        "Scanning Hermes session history. First scan can take 5–10 seconds on large histories.",
+        "Scanning RSLA session history. First scan can take 5–10 seconds on large histories.",
     },
     actions: {
       rescan: "Rescan",
@@ -729,7 +729,7 @@ export const en: Translations = {
       highest_tier: "Highest tier",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "Latest",
-      latest_hint_empty: "run Hermes more",
+      latest_hint_empty: "run RSLA more",
       none_yet: "None yet",
     },
     state: {
@@ -760,10 +760,10 @@ export const en: Translations = {
       tiers_header: "Tiers",
       secret_header: "Secret achievements",
       secret_body:
-        "Secrets hide their exact trigger. Once Hermes sees a related signal, the card becomes Discovered and shows its requirement.",
+        "Secrets hide their exact trigger. Once RSLA sees a related signal, the card becomes Discovered and shows its requirement.",
       scan_status_header: "Scan status",
       scan_status_body:
-        "Hermes is scanning local history once, then cards will appear automatically. Nothing is stuck if this takes a few seconds.",
+        "RSLA is scanning local history once, then cards will appear automatically. Nothing is stuck if this takes a few seconds.",
       what_scanned_header: "What is scanned",
       what_scanned_body:
         "Sessions, tool calls, model metadata, errors, achievements, and local unlock state.",
@@ -810,7 +810,7 @@ export const en: Translations = {
         "Share on X opens a pre-filled post in a new tab. Click Copy image first if you want the 1200×630 badge attached — X lets you paste it right into the tweet composer. Download PNG saves the file for use anywhere.",
       clipboard_unsupported:
         "Clipboard image copy not supported in this browser — use Download instead.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
 

@@ -62,7 +62,7 @@ describe('Wisdom V1 manifest form contract', () => {
   it('reports form-editable semantic errors without losing the form shape', () => {
     const manifest = parseWisdomManifest(JSON.stringify(validManifest()))
     manifest.requirements.hermes.minimum_version = ''
-    expect(wisdomSystemSpecificationValidationError(manifest.requirements)).toBe('Minimum Hermes version is required.')
-    expect(wisdomManifestValidationError(JSON.stringify(manifest))).toBe('Minimum Hermes version is required.')
+    expect(wisdomSystemSpecificationValidationError(manifest.requirements)).toBe('Minimum RSLA version is required.')
+    expect(wisdomManifestValidationError(JSON.stringify(manifest))).toBe('Minimum RSLA version is required.')
   })
 })

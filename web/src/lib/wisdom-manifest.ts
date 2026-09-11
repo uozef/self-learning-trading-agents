@@ -97,8 +97,8 @@ export function parseWisdomSystemSpecification(value: unknown): WisdomSystemSpec
     'System Specification'
   )
 
-  const hermes = requireRecord(specification.hermes, 'Hermes requirement')
-  requireExactKeys(hermes, ['minimum_version'], 'Hermes requirement')
+  const hermes = requireRecord(specification.hermes, 'RSLA requirement')
+  requireExactKeys(hermes, ['minimum_version'], 'RSLA requirement')
   const model = requireRecord(specification.model, 'Model requirement')
   requireExactKeys(model, ['capabilities', 'minimum_context_window'], 'Model requirement')
   if (model.minimum_context_window !== null && typeof model.minimum_context_window !== 'number') {
@@ -136,7 +136,7 @@ export function parseWisdomSystemSpecification(value: unknown): WisdomSystemSpec
   })
 
   return {
-    hermes: { minimum_version: requireString(hermes.minimum_version, 'Minimum Hermes version') },
+    hermes: { minimum_version: requireString(hermes.minimum_version, 'Minimum RSLA version') },
     platforms: requireStringList(specification.platforms, 'Platforms'),
     architectures: requireStringList(specification.architectures, 'Architectures'),
     model: {
@@ -191,7 +191,7 @@ function listError(values: string[], label: string): string | null {
 
 export function wisdomSystemSpecificationValidationError(specification: WisdomSystemSpecification): string | null {
   const errors = [
-    boundedTextError(specification.hermes.minimum_version, 'Minimum Hermes version'),
+    boundedTextError(specification.hermes.minimum_version, 'Minimum RSLA version'),
     specification.model.minimum_context_window !== null &&
     (!Number.isSafeInteger(specification.model.minimum_context_window) ||
       specification.model.minimum_context_window < 1)

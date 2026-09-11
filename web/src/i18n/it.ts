@@ -50,8 +50,8 @@ export const it: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "Chiudi navigazione",
     closeModelTools: "Chiudi modello e strumenti",
     footer: {
@@ -120,8 +120,8 @@ export const it: Translations = {
     starting: "Avvio in corso",
     startedInBackground: "Avviato in background — controlla i log per i progressi",
     stopped: "Arrestato",
-    updateHermes: "Aggiorna Hermes",
-    updatingHermes: "Aggiornamento di Hermes…",
+    updateHermes: "Aggiorna RSLA",
+    updatingHermes: "Aggiornamento di RSLA…",
     waitingForOutput: "In attesa di output…",
   },
 
@@ -326,7 +326,7 @@ export const it: Translations = {
     enableRuntime: "Abilita",
     forceReinstall: "Forza reinstallazione (elimina prima la cartella esistente)",
     headline:
-      "Scopri, installa, abilita e aggiorna i plugin Hermes (parità con `hermes plugins`).",
+      "Scopri, installa, abilita e aggiorna i plugin RSLA (parità con `hermes plugins`).",
     identifierLabel: "URL Git o owner/repo",
     inactive: "inattivo",
     installBtn: "Installa",
@@ -389,21 +389,21 @@ export const it: Translations = {
       search: 'Cerca competenze condivise…',
       potential: 'Contributi suggeriti',
       potentialHelp:
-        'Competenze qualificate localmente da Hermes in base all’uso o a miglioramenti significativi. Nulla viene condiviso prima della tua revisione.',
+        'Competenze qualificate localmente da RSLA in base all’uso o a miglioramenti significativi. Nulla viene condiviso prima della tua revisione.',
       noSuggestions: 'Al momento nessuna competenza locale soddisfa le regole di qualificazione automatica.',
       browseLocal: count => `Visualizza tutte le competenze locali (${count})`,
       browseLocalHelp:
-        'La selezione manuale non significa che Hermes abbia usato o qualificato automaticamente queste competenze.',
+        'La selezione manuale non significa che RSLA abbia usato o qualificato automaticamente queste competenze.',
       ownerReview: 'Le tue bozze di contributo',
       ownerReviewHelp: 'Bozze in attesa della tua revisione e invii in attesa dell’approvazione del collettivo.',
       noDrafts: 'Nessuna bozza o invio di contributo attivo.',
       prepare: 'Inizia contributo',
       continueDraft: 'Continua bozza',
       localOnly: 'Disponibile per la condivisione da questo dispositivo',
-      qualifiedLocally: 'Hermes ha identificato questa competenza locale come possibile contributo.',
+      qualifiedLocally: 'RSLA ha identificato questa competenza locale come possibile contributo.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `La tua organizzazione (${organizationName})` : 'La tua organizzazione'} ha attivato Collective Wisdom, una funzione progettata per rilevare automaticamente competenze utili tra tutti i membri del team. Congratulazioni! Hermes ha rilevato una competenza che potrebbe essere utile al tuo team.`,
-      qualificationReturning: 'Hermes ha rilevato un’altra competenza che potrebbe essere utile al tuo team.',
+        `${organizationName ? `La tua organizzazione (${organizationName})` : 'La tua organizzazione'} ha attivato Collective Wisdom, una funzione progettata per rilevare automaticamente competenze utili tra tutti i membri del team. Congratulazioni! RSLA ha rilevato una competenza che potrebbe essere utile al tuo team.`,
+      qualificationReturning: 'RSLA ha rilevato un’altra competenza che potrebbe essere utile al tuo team.',
       savedLocally: 'Una bozza privata è salvata su questo dispositivo.',
       reviewExact: 'Visualizza dettagli',
       draftState: state => {
@@ -448,7 +448,7 @@ export const it: Translations = {
       installReferenceLabel: 'Installa da link o ID skill',
       installReferencePlaceholder: 'Incolla un link del Portal, un ID skill o skill-id@vN',
       installReferenceHelp:
-        'Hermes verifica la versione esatta e mostra un piano di compatibilità prima dell’installazione.',
+        'RSLA verifica la versione esatta e mostra un piano di compatibilità prima dell’installazione.',
       reviewInstall: 'Rivedi installazione',
       planningInstall: 'Verifica…',
       updateModeLabel: 'Aggiornamenti futuri',
@@ -562,7 +562,7 @@ export const it: Translations = {
     showValue: "Mostra valore reale",
     hideValue: "Nascondi valore",
     customTitle: "Chiavi personalizzate",
-    customHint: "Variabili d'ambiente arbitrarie salvate nel tuo .env che Hermes non riconosce. Usale per iniettare variabili d'ambiente per skill, server MCP o i tuoi strumenti.",
+    customHint: "Variabili d'ambiente arbitrarie salvate nel tuo .env che RSLA non riconosce. Usale per iniettare variabili d'ambiente per skill, server MCP o i tuoi strumenti.",
     customConfigured: "{count} chiave/i personalizzata/e impostata/e",
     addCustomKey: "Aggiungi una chiave personalizzata",
     customKeyName: "Nome della variabile",
@@ -626,11 +626,11 @@ export const it: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "Badge Hermes da collezione, ottenuti dalla cronologia reale delle sessioni. Gli achievement noti non completati vengono mostrati come Scoperti; gli achievement segreti restano nascosti finché non compare il primo comportamento corrispondente.",
+        "Badge RSLA da collezione, ottenuti dalla cronologia reale delle sessioni. Gli achievement noti non completati vengono mostrati come Scoperti; gli achievement segreti restano nascosti finché non compare il primo comportamento corrispondente.",
       scan_subtitle:
-        "Scansione della cronologia delle sessioni Hermes in corso. La prima scansione può richiedere 5–10 secondi su cronologie ampie.",
+        "Scansione della cronologia delle sessioni RSLA in corso. La prima scansione può richiedere 5–10 secondi su cronologie ampie.",
     },
     actions: {
       rescan: "Riscansiona",
@@ -645,7 +645,7 @@ export const it: Translations = {
       highest_tier: "Livello più alto",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "Più recente",
-      latest_hint_empty: "usa Hermes di più",
+      latest_hint_empty: "usa RSLA di più",
       none_yet: "Nessuno ancora",
     },
     state: {
@@ -676,10 +676,10 @@ export const it: Translations = {
       tiers_header: "Livelli",
       secret_header: "Achievement segreti",
       secret_body:
-        "I segreti nascondono il loro trigger esatto. Quando Hermes rileva un segnale correlato, la carta passa a Scoperto e mostra il requisito.",
+        "I segreti nascondono il loro trigger esatto. Quando RSLA rileva un segnale correlato, la carta passa a Scoperto e mostra il requisito.",
       scan_status_header: "Stato della scansione",
       scan_status_body:
-        "Hermes sta scansionando la cronologia locale una sola volta, poi le carte appariranno automaticamente. Non è bloccato nulla se richiede qualche secondo.",
+        "RSLA sta scansionando la cronologia locale una sola volta, poi le carte appariranno automaticamente. Non è bloccato nulla se richiede qualche secondo.",
       what_scanned_header: "Cosa viene scansionato",
       what_scanned_body:
         "Sessioni, chiamate agli strumenti, metadati del modello, errori, achievement e stato di sblocco locale.",
@@ -726,7 +726,7 @@ export const it: Translations = {
         "Condividi su X apre un post precompilato in una nuova scheda. Clicca prima su Copia immagine se vuoi allegare il badge 1200×630 — X ti permette di incollarlo direttamente nell'editor del tweet. Scarica PNG salva il file per l'uso ovunque.",
       clipboard_unsupported:
         "La copia delle immagini negli appunti non è supportata in questo browser — usa Scarica invece.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
   kanban: {

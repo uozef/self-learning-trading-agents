@@ -49,8 +49,8 @@ export const zh: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "关闭导航",
     closeModelTools: "关闭模型与工具",
     footer: {
@@ -119,8 +119,8 @@ export const zh: Translations = {
     starting: "启动中",
     startedInBackground: "已在后台启动 — 请查看日志",
     stopped: "已停止",
-    updateHermes: "更新 Hermes",
-    updatingHermes: "正在更新 Hermes…",
+    updateHermes: "更新 RSLA",
+    updatingHermes: "正在更新 RSLA…",
     waitingForOutput: "等待输出…",
   },
 
@@ -321,7 +321,7 @@ export const zh: Translations = {
     enableAfterInstall: "安装后启用",
     enableRuntime: "启用",
     forceReinstall: "强制重装（先删除已有目录）",
-    headline: "发现、安装、启用和更新 Hermes 插件（对齐 `hermes plugins` CLI）。",
+    headline: "发现、安装、启用和更新 RSLA 插件（对齐 `hermes plugins` CLI）。",
     identifierLabel: "Git 地址或 owner/repo",
     inactive: "未启用",
     installBtn: "安装",
@@ -383,20 +383,20 @@ export const zh: Translations = {
       scanLocal: '扫描本地技能',
       search: '搜索共享技能…',
       potential: '建议的贡献',
-      potentialHelp: 'Hermes 根据本地使用或有意义的改进判定为合格的技能。在你审核前不会共享。',
+      potentialHelp: 'RSLA 根据本地使用或有意义的改进判定为合格的技能。在你审核前不会共享。',
       noSuggestions: '目前没有本地技能符合自动资格规则。',
       browseLocal: count => `查看所有本地技能 (${count})`,
-      browseLocalHelp: '手动选择并不表示 Hermes 使用过这些技能或已自动判定其合格。',
+      browseLocalHelp: '手动选择并不表示 RSLA 使用过这些技能或已自动判定其合格。',
       ownerReview: '你的贡献草稿',
       ownerReviewHelp: '等待你审核的草稿，以及等待集体批准的提交。',
       noDrafts: '没有进行中的贡献草稿或提交。',
       prepare: '开始贡献',
       continueDraft: '继续编辑草稿',
       localOnly: '可从此设备共享',
-      qualifiedLocally: 'Hermes 将此本地技能识别为可能的贡献。',
+      qualifiedLocally: 'RSLA 将此本地技能识别为可能的贡献。',
       qualificationFirst: organizationName =>
-        `${organizationName ? `您的组织（${organizationName}）` : '您的组织'}已启用 Collective Wisdom，此功能会自动发现所有团队成员的实用技能。恭喜！Hermes 检测到一项可能对您的团队有用的技能。`,
-      qualificationReturning: 'Hermes 又检测到一项可能对您的团队有用的技能。',
+        `${organizationName ? `您的组织（${organizationName}）` : '您的组织'}已启用 Collective Wisdom，此功能会自动发现所有团队成员的实用技能。恭喜！RSLA 检测到一项可能对您的团队有用的技能。`,
+      qualificationReturning: 'RSLA 又检测到一项可能对您的团队有用的技能。',
       savedLocally: '私有草稿已保存在此设备上。',
       reviewExact: '查看详情',
       draftState: state => {
@@ -440,7 +440,7 @@ export const zh: Translations = {
       refreshingShared: '正在刷新…',
       installReferenceLabel: '通过链接或技能 ID 安装',
       installReferencePlaceholder: '粘贴 Portal 链接、技能 ID 或 skill-id@vN',
-      installReferenceHelp: 'Hermes 会先验证准确版本并显示兼容性计划，然后再安装。',
+      installReferenceHelp: 'RSLA 会先验证准确版本并显示兼容性计划，然后再安装。',
       reviewInstall: '检查安装',
       planningInstall: '验证中…',
       updateModeLabel: '后续更新',
@@ -551,7 +551,7 @@ export const zh: Translations = {
     showValue: "显示实际值",
     hideValue: "隐藏值",
     customTitle: "自定义密钥",
-    customHint: "存储在 .env 中、Hermes 无法识别的任意环境变量。可用于为技能、MCP 服务器或你自己的工具注入环境变量。",
+    customHint: "存储在 .env 中、RSLA 无法识别的任意环境变量。可用于为技能、MCP 服务器或你自己的工具注入环境变量。",
     customConfigured: "已设置 {count} 个自定义密钥",
     addCustomKey: "添加自定义密钥",
     customKeyName: "变量名",
@@ -616,11 +616,11 @@ export const zh: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "从真实会话历史中获得的 Hermes 可收集徽章。已知尚未达成的成就显示为「已发现」；秘密成就在首次出现匹配行为之前保持隐藏。",
+        "从真实会话历史中获得的 RSLA 可收集徽章。已知尚未达成的成就显示为「已发现」；秘密成就在首次出现匹配行为之前保持隐藏。",
       scan_subtitle:
-        "正在扫描 Hermes 会话历史。在历史记录较多时，首次扫描可能需要 5–10 秒。",
+        "正在扫描 RSLA 会话历史。在历史记录较多时，首次扫描可能需要 5–10 秒。",
     },
     actions: {
       rescan: "重新扫描",
@@ -635,7 +635,7 @@ export const zh: Translations = {
       highest_tier: "最高等级",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "最新",
-      latest_hint_empty: "多多运行 Hermes",
+      latest_hint_empty: "多多运行 RSLA",
       none_yet: "暂无",
     },
     state: {
@@ -666,10 +666,10 @@ export const zh: Translations = {
       tiers_header: "等级",
       secret_header: "秘密成就",
       secret_body:
-        "秘密成就会隐藏其确切触发条件。一旦 Hermes 检测到相关信号，卡片将变为「已发现」并显示其要求。",
+        "秘密成就会隐藏其确切触发条件。一旦 RSLA 检测到相关信号，卡片将变为「已发现」并显示其要求。",
       scan_status_header: "扫描状态",
       scan_status_body:
-        "Hermes 正在对本地历史进行一次扫描，之后卡片会自动出现。即使这需要几秒钟，也没有卡住。",
+        "RSLA 正在对本地历史进行一次扫描，之后卡片会自动出现。即使这需要几秒钟，也没有卡住。",
       what_scanned_header: "扫描内容",
       what_scanned_body:
         "会话、工具调用、模型元数据、错误、成就和本地解锁状态。",
@@ -716,7 +716,7 @@ export const zh: Translations = {
         "「在 X 上分享」会在新标签页中打开预填好的帖子。如果想附上 1200×630 的徽章，请先点击「复制图片」—— X 允许你直接粘贴到推文编辑器中。「下载 PNG」会将文件保存下来，可在任意位置使用。",
       clipboard_unsupported:
         "此浏览器不支持复制剪贴板图片 —— 请改用「下载」。",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
 

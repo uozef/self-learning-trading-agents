@@ -50,8 +50,8 @@ export const ko: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "내비게이션 닫기",
     closeModelTools: "모델 및 도구 닫기",
     footer: {
@@ -120,8 +120,8 @@ export const ko: Translations = {
     starting: "시작 중",
     startedInBackground: "백그라운드에서 시작됨 — 진행 상황은 로그를 확인하세요",
     stopped: "중지됨",
-    updateHermes: "Hermes 업데이트",
-    updatingHermes: "Hermes 업데이트 중…",
+    updateHermes: "RSLA 업데이트",
+    updatingHermes: "RSLA 업데이트 중…",
     waitingForOutput: "출력 대기 중…",
   },
 
@@ -325,7 +325,7 @@ export const ko: Translations = {
     enableRuntime: "활성화",
     forceReinstall: "강제 재설치 (기존 폴더를 먼저 삭제)",
     headline:
-      "Hermes 플러그인을 검색, 설치, 활성화 및 업데이트합니다 (`hermes plugins` 동등).",
+      "RSLA 플러그인을 검색, 설치, 활성화 및 업데이트합니다 (`hermes plugins` 동등).",
     identifierLabel: "Git URL 또는 owner/repo",
     inactive: "비활성",
     installBtn: "설치",
@@ -388,20 +388,20 @@ export const ko: Translations = {
       search: '공유 스킬 검색…',
       potential: '제안된 기여',
       potentialHelp:
-        '사용 또는 의미 있는 개선을 바탕으로 Hermes가 로컬에서 자격을 확인한 스킬입니다. 검토하기 전에는 공유되지 않습니다.',
+        '사용 또는 의미 있는 개선을 바탕으로 RSLA가 로컬에서 자격을 확인한 스킬입니다. 검토하기 전에는 공유되지 않습니다.',
       noSuggestions: '현재 자동 자격 규칙을 충족하는 로컬 스킬이 없습니다.',
       browseLocal: count => `모든 로컬 스킬 보기 (${count})`,
-      browseLocalHelp: '수동 선택은 Hermes가 해당 스킬을 사용했거나 자동으로 자격을 확인했다는 뜻이 아닙니다.',
+      browseLocalHelp: '수동 선택은 RSLA가 해당 스킬을 사용했거나 자동으로 자격을 확인했다는 뜻이 아닙니다.',
       ownerReview: '내 기여 초안',
       ownerReviewHelp: '검토를 기다리는 초안과 컬렉티브 승인을 기다리는 제출입니다.',
       noDrafts: '진행 중인 기여 초안이나 제출이 없습니다.',
       prepare: '기여 시작',
       continueDraft: '초안 계속하기',
       localOnly: '이 기기에서 공유 가능',
-      qualifiedLocally: 'Hermes가 이 로컬 스킬을 기여 후보로 식별했습니다.',
+      qualifiedLocally: 'RSLA가 이 로컬 스킬을 기여 후보로 식별했습니다.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `조직(${organizationName})에서` : '조직에서'} 모든 팀원의 유용한 스킬을 자동으로 감지하는 Collective Wisdom을 활성화했습니다. 축하합니다! Hermes가 팀에 유용할 수 있는 스킬을 감지했습니다.`,
-      qualificationReturning: 'Hermes가 팀에 유용할 수 있는 또 다른 스킬을 감지했습니다.',
+        `${organizationName ? `조직(${organizationName})에서` : '조직에서'} 모든 팀원의 유용한 스킬을 자동으로 감지하는 Collective Wisdom을 활성화했습니다. 축하합니다! RSLA가 팀에 유용할 수 있는 스킬을 감지했습니다.`,
+      qualificationReturning: 'RSLA가 팀에 유용할 수 있는 또 다른 스킬을 감지했습니다.',
       savedLocally: '이 기기에 비공개 초안이 저장되어 있습니다.',
       reviewExact: '세부정보 보기',
       draftState: state => {
@@ -445,7 +445,7 @@ export const ko: Translations = {
       refreshingShared: '새로 고치는 중…',
       installReferenceLabel: '링크 또는 스킬 ID로 설치',
       installReferencePlaceholder: 'Portal 링크, 스킬 ID 또는 skill-id@vN 붙여넣기',
-      installReferenceHelp: 'Hermes가 정확한 버전을 검증하고 설치 전에 호환성 계획을 표시합니다.',
+      installReferenceHelp: 'RSLA가 정확한 버전을 검증하고 설치 전에 호환성 계획을 표시합니다.',
       reviewInstall: '설치 검토',
       planningInstall: '검증 중…',
       updateModeLabel: '향후 업데이트',
@@ -557,7 +557,7 @@ export const ko: Translations = {
     showValue: "실제 값 표시",
     hideValue: "값 숨기기",
     customTitle: "사용자 지정 키",
-    customHint: "Hermes가 인식하지 못하는, .env에 저장된 임의의 환경 변수입니다. 스킬, MCP 서버 또는 자체 도구를 위한 환경 변수를 주입하는 데 사용하세요.",
+    customHint: "RSLA가 인식하지 못하는, .env에 저장된 임의의 환경 변수입니다. 스킬, MCP 서버 또는 자체 도구를 위한 환경 변수를 주입하는 데 사용하세요.",
     customConfigured: "사용자 지정 키 {count}개 설정됨",
     addCustomKey: "사용자 지정 키 추가",
     customKeyName: "변수 이름",
@@ -622,11 +622,11 @@ export const ko: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "실제 세션 기록에서 획득하는 Hermes 컬렉터블 배지입니다. 알려져 있지만 아직 달성되지 않은 업적은 Discovered로 표시되며, Secret 업적은 일치하는 동작이 처음 나타날 때까지 숨겨집니다.",
+        "실제 세션 기록에서 획득하는 RSLA 컬렉터블 배지입니다. 알려져 있지만 아직 달성되지 않은 업적은 Discovered로 표시되며, Secret 업적은 일치하는 동작이 처음 나타날 때까지 숨겨집니다.",
       scan_subtitle:
-        "Hermes 세션 기록을 스캔하고 있습니다. 기록이 많으면 첫 스캔에 5~10초가 걸릴 수 있습니다.",
+        "RSLA 세션 기록을 스캔하고 있습니다. 기록이 많으면 첫 스캔에 5~10초가 걸릴 수 있습니다.",
     },
     actions: {
       rescan: "다시 스캔",
@@ -641,7 +641,7 @@ export const ko: Translations = {
       highest_tier: "최고 등급",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "최근",
-      latest_hint_empty: "Hermes를 더 사용해 보세요",
+      latest_hint_empty: "RSLA를 더 사용해 보세요",
       none_yet: "아직 없음",
     },
     state: {
@@ -672,10 +672,10 @@ export const ko: Translations = {
       tiers_header: "등급",
       secret_header: "시크릿 업적",
       secret_body:
-        "시크릿은 정확한 트리거 조건을 숨깁니다. Hermes가 관련 신호를 감지하면 카드가 Discovered로 바뀌고 요건이 표시됩니다.",
+        "시크릿은 정확한 트리거 조건을 숨깁니다. RSLA가 관련 신호를 감지하면 카드가 Discovered로 바뀌고 요건이 표시됩니다.",
       scan_status_header: "스캔 상태",
       scan_status_body:
-        "Hermes는 로컬 기록을 한 번 스캔한 뒤 카드를 자동으로 표시합니다. 몇 초 걸리더라도 멈춘 것이 아닙니다.",
+        "RSLA는 로컬 기록을 한 번 스캔한 뒤 카드를 자동으로 표시합니다. 몇 초 걸리더라도 멈춘 것이 아닙니다.",
       what_scanned_header: "스캔 대상",
       what_scanned_body:
         "세션, 도구 호출, 모델 메타데이터, 오류, 업적 및 로컬 해제 상태입니다.",
@@ -722,7 +722,7 @@ export const ko: Translations = {
         "X에 공유를 누르면 새 탭에서 미리 작성된 게시물이 열립니다. 1200×630 배지를 첨부하려면 먼저 이미지 복사를 누르세요 — X 작성기에서 바로 붙여넣을 수 있습니다. PNG 다운로드는 파일을 저장하여 어디서나 사용할 수 있게 합니다.",
       clipboard_unsupported:
         "이 브라우저에서는 클립보드 이미지 복사를 지원하지 않습니다 — 대신 다운로드를 이용하세요.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
   kanban: {

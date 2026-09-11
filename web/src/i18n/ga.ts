@@ -50,8 +50,8 @@ export const ga: Translations = {
   },
 
   app: {
-    brand: "Hermes Agent",
-    brandShort: "HA",
+    brand: "Recursive Self Learning Agents",
+    brandShort: "RSLA",
     closeNavigation: "Dún an nascleanúint",
     closeModelTools: "Dún an samhail agus na huirlisí",
     footer: {
@@ -120,8 +120,8 @@ export const ga: Translations = {
     starting: "Ag tosú",
     startedInBackground: "Tosaithe sa chúlra — seiceáil na logaí le haghaidh dul chun cinn",
     stopped: "Stoptha",
-    updateHermes: "Nuashonraigh Hermes",
-    updatingHermes: "Ag nuashonrú Hermes…",
+    updateHermes: "Nuashonraigh RSLA",
+    updatingHermes: "Ag nuashonrú RSLA…",
     waitingForOutput: "Ag fanacht le haschur…",
   },
 
@@ -334,7 +334,7 @@ export const ga: Translations = {
     enableRuntime: "Cumasaigh",
     forceReinstall: "Cuir iallach ar athshuiteáil (scrios an fillteán atá ann ar dtús)",
     headline:
-      "Faigh, suiteáil, cumasaigh agus nuashonraigh plugins Hermes (paireacht le `hermes plugins`).",
+      "Faigh, suiteáil, cumasaigh agus nuashonraigh plugins RSLA (paireacht le `hermes plugins`).",
     identifierLabel: "URL Git nó owner/repo",
     inactive: "neamhghníomhach",
     installBtn: "Suiteáil",
@@ -397,11 +397,11 @@ export const ga: Translations = {
       search: 'Cuardaigh scileanna comhroinnte…',
       potential: 'Ranníocaíochtaí molta',
       potentialHelp:
-        'Scileanna a cháiligh Hermes go háitiúil ó úsáid nó ó mhionchoigeartú suntasach. Ní roinntear aon rud go dtí go ndéanann tú athbhreithniú air.',
+        'Scileanna a cháiligh RSLA go háitiúil ó úsáid nó ó mhionchoigeartú suntasach. Ní roinntear aon rud go dtí go ndéanann tú athbhreithniú air.',
       noSuggestions: 'Níl aon scileanna áitiúla ann faoi láthair a chomhlíonann na rialacha cáilithe uathoibríocha.',
       browseLocal: count => `Féach ar gach scil áitiúil (${count})`,
       browseLocalHelp:
-        'Ní chiallaíonn roghnú láimhe gur úsáid Hermes na scileanna seo nó gur cháiligh sé iad go huathoibríoch.',
+        'Ní chiallaíonn roghnú láimhe gur úsáid RSLA na scileanna seo nó gur cháiligh sé iad go huathoibríoch.',
       ownerReview: 'Do dhréachtaí ranníocaíochta',
       ownerReviewHelp:
         'Dréachtaí ag fanacht le d’athbhreithniú agus aighneachtaí ag fanacht le ceadú an chomhchoitinn.',
@@ -409,10 +409,10 @@ export const ga: Translations = {
       prepare: 'Tosaigh ranníocaíocht',
       continueDraft: 'Lean leis an dréacht',
       localOnly: 'Ar fáil le roinnt ón ngléas seo',
-      qualifiedLocally: 'D’aithin Hermes an scil áitiúil seo mar ranníocaíocht fhéideartha.',
+      qualifiedLocally: 'D’aithin RSLA an scil áitiúil seo mar ranníocaíocht fhéideartha.',
       qualificationFirst: organizationName =>
-        `${organizationName ? `Chumasaigh d’eagraíocht (${organizationName})` : 'Chumasaigh d’eagraíocht'} Collective Wisdom, gné a aimsíonn scileanna úsáideacha go huathoibríoch i measc bhaill uile na foirne. Comhghairdeas! D’aimsigh Hermes scil a d’fhéadfadh a bheith úsáideach do d’fhoireann.`,
-      qualificationReturning: 'D’aimsigh Hermes scil eile a d’fhéadfadh a bheith úsáideach do d’fhoireann.',
+        `${organizationName ? `Chumasaigh d’eagraíocht (${organizationName})` : 'Chumasaigh d’eagraíocht'} Collective Wisdom, gné a aimsíonn scileanna úsáideacha go huathoibríoch i measc bhaill uile na foirne. Comhghairdeas! D’aimsigh RSLA scil a d’fhéadfadh a bheith úsáideach do d’fhoireann.`,
+      qualificationReturning: 'D’aimsigh RSLA scil eile a d’fhéadfadh a bheith úsáideach do d’fhoireann.',
       savedLocally: 'Tá dréacht príobháideach sábháilte ar an ngléas seo.',
       reviewExact: 'Féach ar na sonraí',
       draftState: state => {
@@ -457,7 +457,7 @@ export const ga: Translations = {
       installReferenceLabel: 'Suiteáil ó nasc nó ó ID scile',
       installReferencePlaceholder: 'Greamaigh nasc Portal, ID scile nó skill-id@vN',
       installReferenceHelp:
-        'Fíoraíonn Hermes an leagan cruinn agus taispeánann sé plean comhoiriúnachta roimh shuiteáil.',
+        'Fíoraíonn RSLA an leagan cruinn agus taispeánann sé plean comhoiriúnachta roimh shuiteáil.',
       reviewInstall: 'Athbhreithnigh an tsuiteáil',
       planningInstall: 'Á fhíorú…',
       updateModeLabel: 'Nuashonruithe amach anseo',
@@ -570,7 +570,7 @@ export const ga: Translations = {
     showValue: "Taispeáin an fíorluach",
     hideValue: "Folaigh an luach",
     customTitle: "Eochracha Saincheaptha",
-    customHint: "Athróga timpeallachta treallach atá stóráilte i do .env nach n-aithníonn Hermes. Úsáid iad chun athróga timpeallachta a instealladh do scileanna, freastalaithe MCP, nó d'uirlisí féin.",
+    customHint: "Athróga timpeallachta treallach atá stóráilte i do .env nach n-aithníonn RSLA. Úsáid iad chun athróga timpeallachta a instealladh do scileanna, freastalaithe MCP, nó d'uirlisí féin.",
     customConfigured: "{count} eochair shaincheaptha socraithe",
     addCustomKey: "Cuir eochair shaincheaptha leis",
     customKeyName: "Ainm na hathróige",
@@ -635,11 +635,11 @@ export const ga: Translations = {
   achievements: {
     hero: {
       kicker: "Agentic Gamerscore",
-      title: "Hermes Achievements",
+      title: "RSLA Achievements",
       subtitle:
-        "Suaitheantais Hermes inbhailithe a thuilltear ó stair fíor-session. Léirítear gnóthachtálacha aitheanta neamhchríochnaithe mar Discovered; fanann gnóthachtálacha Secret i bhfolach go dtí go bhfeictear an chéad iompar comhoiriúnach.",
+        "Suaitheantais RSLA inbhailithe a thuilltear ó stair fíor-session. Léirítear gnóthachtálacha aitheanta neamhchríochnaithe mar Discovered; fanann gnóthachtálacha Secret i bhfolach go dtí go bhfeictear an chéad iompar comhoiriúnach.",
       scan_subtitle:
-        "Stair session Hermes á scanadh. Is féidir leis an gcéad scan 5–10 soicind a thógáil ar staireanna móra.",
+        "Stair session RSLA á scanadh. Is féidir leis an gcéad scan 5–10 soicind a thógáil ar staireanna móra.",
     },
     actions: {
       rescan: "Athscan",
@@ -654,7 +654,7 @@ export const ga: Translations = {
       highest_tier: "An leibhéal is airde",
       highest_tier_hint: "Copper → Silver → Gold → Diamond → Olympian",
       latest: "An ceann is déanaí",
-      latest_hint_empty: "rith Hermes níos mó",
+      latest_hint_empty: "rith RSLA níos mó",
       none_yet: "Aon cheann fós",
     },
     state: {
@@ -685,10 +685,10 @@ export const ga: Translations = {
       tiers_header: "Leibhéil",
       secret_header: "Gnóthachtálacha rúnda",
       secret_body:
-        "Coinníonn rúin a dtruicear cruinn faoi cheilt. Nuair a fheiceann Hermes comhartha gaolmhar, athraíonn an cárta go Aimsithe agus taispeánann sé a riachtanas.",
+        "Coinníonn rúin a dtruicear cruinn faoi cheilt. Nuair a fheiceann RSLA comhartha gaolmhar, athraíonn an cárta go Aimsithe agus taispeánann sé a riachtanas.",
       scan_status_header: "Stádas an scanta",
       scan_status_body:
-        "Scanann Hermes an stair logánta uair amháin, ansin feicfear cártaí go huathoibríoch. Níl aon rud sáinnithe má thógann sé cúpla soicind.",
+        "Scanann RSLA an stair logánta uair amháin, ansin feicfear cártaí go huathoibríoch. Níl aon rud sáinnithe má thógann sé cúpla soicind.",
       what_scanned_header: "Cad a scantar",
       what_scanned_body:
         "Sessions, glaonna ar uirlisí, meiteashonraí samhla, earráidí, gnóthachtálacha agus staid díghlasála logánta.",
@@ -735,7 +735,7 @@ export const ga: Translations = {
         "Osclaíonn Comhroinn ar X post réamhlíonta i gcluaisín nua. Cliceáil Cóipeáil íomhá ar dtús más mian leat an suaitheantas 1200×630 a bheith ceangailte — ligeann X duit é a ghreamú díreach isteach i scríbhneoir an tweet. Sábhálann Íoslódáil PNG an comhad le húsáid áit ar bith.",
       clipboard_unsupported:
         "Ní thacaítear le cóipeáil íomhá chuig an ngearrthaisce sa bhrabhsálaí seo — úsáid Íoslódáil ina ionad sin.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Hermes Agent ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Recursive Self Learning Agents ☤",
     },
   },
   kanban: {
