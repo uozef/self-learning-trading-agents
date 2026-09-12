@@ -41,6 +41,25 @@ Set the public origin so the dashboard builds correct absolute URLs:
 npx wrangler secret put RSLA_PUBLIC_URL   # e.g. https://recursive-self-learning-agents.<subdomain>.workers.dev
 ```
 
+## The agent's Claude credential
+
+The Claude connector authenticates with a **Claude subscription auth token**, not a
+Console API key. Mint one on a machine with the Claude CLI and paste it in:
+
+```bash
+claude setup-token          # prints an sk-ant-oat01… token
+npx wrangler secret put RSLA_CLAUDE_CODE_OAUTH_TOKEN
+```
+
+The token reaches the container as `CLAUDE_CODE_OAUTH_TOKEN`. It is an OAuth
+credential, so the agent sends it as `Authorization: Bearer` with Claude's OAuth
+beta headers; sent as `x-api-key` it would 401.
+
+To use a Console API key instead, set `RSLA_ANTHROPIC_API_KEY`. If both are set the
+Claude token wins, which is the connector's documented precedence. Neither is
+required to deploy: without one the dashboard still loads and prompts for a
+provider.
+
 ## Isolation
 
 `RSLA_ISOLATION` in `wrangler.jsonc` chooses the model.

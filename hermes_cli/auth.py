@@ -213,9 +213,17 @@ _REGISTRY_ROWS: Tuple[Any, ...] = (
     # yields an `sk-ant-oat01…` OAuth token (401s as x-api-key, 429s as bare Bearer). It stays in
     # this tuple because the tuple doubles as the credential-DISCOVERY list
     # (agent/credential_pool.py builds its env scan from it); the adapter routes it down the OAuth
-    # path by prefix. Only ANTHROPIC_API_KEY and ANTHROPIC_TOKEN are usable as literal API keys.
+    # path by prefix. Only ANTHROPIC_API_KEY is usable as a literal API key.
+    #
+    # Order mirrors ``agent.anthropic_credentials.resolve_anthropic_token()`` exactly — Claude auth
+    # token first, Console API key last. The two used to disagree: resolve_anthropic_token() read
+    # ANTHROPIC_TOKEN / CLAUDE_CODE_OAUTH_TOKEN before ANTHROPIC_API_KEY, while everything that
+    # walks this tuple (get_anthropic_key, resolve_provider_credentials, the dashboard's Anthropic
+    # card, doctor's connectivity probe) took the first entry and so preferred the API key. An
+    # environment holding both then authenticated as a subscription in one code path and as a
+    # Console key in another.
     ("anthropic", "Anthropic", "https://api.anthropic.com",
-     ("ANTHROPIC_API_KEY", "ANTHROPIC_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN"), "ANTHROPIC_BASE_URL"),
+     ("ANTHROPIC_TOKEN", "CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY"), "ANTHROPIC_BASE_URL"),
     ("alibaba", "Qwen Cloud", "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
      ("DASHSCOPE_API_KEY",), "DASHSCOPE_BASE_URL"),
     ("alibaba-coding-plan", "Alibaba Cloud (Coding Plan)", "https://coding-intl.dashscope.aliyuncs.com/v1",

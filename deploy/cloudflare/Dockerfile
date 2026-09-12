@@ -57,12 +57,18 @@ RUN rm -rf /opt/hermes/hermes_cli/web_dist
 COPY --chmod=a+rX,go-w --from=web_build /build/hermes_cli/web_dist/ /opt/hermes/hermes_cli/web_dist/
 COPY --chmod=a+rX,go-w locales/ /opt/hermes/locales/
 
-# The two Python modules the rebrand touches. Only these, not the whole
-# hermes_cli tree: the base image's venv is an editable install of its own
-# source, and wholesale replacement would silently mix this checkout against
-# dependencies resolved for a different commit.
+# The Python modules this fork changes. Only these, not the whole hermes_cli
+# tree: the base image's venv is an editable install of its own source, and
+# wholesale replacement would silently mix this checkout against dependencies
+# resolved for a different commit.
+#
+# login_page.py and web_server.py carry the rebrand. auth.py and the anthropic
+# provider plugin carry the credential-precedence fix that makes the Claude
+# connector authenticate with the Claude auth token instead of a Console API key.
 COPY --chmod=a+rX,go-w hermes_cli/dashboard_auth/login_page.py /opt/hermes/hermes_cli/dashboard_auth/login_page.py
 COPY --chmod=a+rX,go-w hermes_cli/web_server.py /opt/hermes/hermes_cli/web_server.py
+COPY --chmod=a+rX,go-w hermes_cli/auth.py /opt/hermes/hermes_cli/auth.py
+COPY --chmod=a+rX,go-w plugins/model-providers/anthropic/__init__.py /opt/hermes/plugins/model-providers/anthropic/__init__.py
 
 # The Worker forwards to this port; Cloudflare gives the container no public
 # ingress of its own.

@@ -31,6 +31,14 @@ export interface Env {
   RSLA_DASHBOARD_SECRET?: string;
   /** When set, the Worker pre-gate is enforced before any container starts. */
   RSLA_GATE_PASSWORD?: string;
+  /**
+   * Claude subscription auth token from `claude setup-token` (an `sk-ant-oat01…`
+   * value). This is the agent's Claude credential and is preferred over a Console
+   * API key. Set `RSLA_ANTHROPIC_API_KEY` only to authenticate with a Console key
+   * instead; if both are set the Claude token wins, matching the connector.
+   */
+  RSLA_CLAUDE_CODE_OAUTH_TOKEN?: string;
+  RSLA_ANTHROPIC_API_KEY?: string;
 }
 
 const GATE_COOKIE = "rsla_gate";
@@ -51,6 +59,11 @@ export class AgentContainer extends Container<Env> {
     HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: this.env.RSLA_DASHBOARD_PASSWORD ?? "",
     HERMES_DASHBOARD_BASIC_AUTH_SECRET: this.env.RSLA_DASHBOARD_SECRET ?? "",
     HERMES_DASHBOARD_PUBLIC_URL: this.env.RSLA_PUBLIC_URL ?? "",
+    // The agent's Claude credential. The connector reads the Claude auth token
+    // ahead of the Console API key, so passing both leaves the subscription in
+    // charge. Empty values are fine: the agent treats a blank env var as absent.
+    CLAUDE_CODE_OAUTH_TOKEN: this.env.RSLA_CLAUDE_CODE_OAUTH_TOKEN ?? "",
+    ANTHROPIC_API_KEY: this.env.RSLA_ANTHROPIC_API_KEY ?? "",
   };
 
   override onStart() {
