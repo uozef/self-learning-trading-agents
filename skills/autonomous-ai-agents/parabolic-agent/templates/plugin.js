@@ -1,8 +1,8 @@
 /**
- * Hermes desktop plugin template. Save as:
- *   <hermes home>/desktop-plugins/<id>/plugin.js   (folder name == id)
- * where <hermes home> is ~/.hermes by default, or ~/.hermes/profiles/<name>
- * when running a named profile (`hermes -p <name>`). Run `hermes doctor` (or
+ * Parabolic desktop plugin template. Save as:
+ *   <parabolic home>/desktop-plugins/<id>/plugin.js   (folder name == id)
+ * where <parabolic home> is ~/.hermes by default, or ~/.hermes/profiles/<name>
+ * when running a named profile (`parabolic -p <name>`). Run `parabolic doctor` (or
  * check the app's Settings → Plugins folder path) if unsure which is active.
  * Then run "Reload desktop plugins" from ⌘K in the desktop app.
  *
