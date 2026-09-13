@@ -45,18 +45,26 @@ plugins:
 ```
 
 ```bash
-# Both are minted by the console and kept in its own browser storage:
-#   LIVEAGENTS_TERMINAL_TOKEN  <- localStorage.la_terminal_token
-#   LIVEAGENTS_API_TOKEN       <- localStorage.la_dex_token
-export LIVEAGENTS_TERMINAL_TOKEN=…
-export LIVEAGENTS_API_TOKEN=…
+# A workspace key, created at the console under Connect Claude Code -> Workspace keys:
+export LIVEAGENTS_TERMINAL_TOKEN=lat_…
+# The exchange session, from the console's own browser storage:
+export LIVEAGENTS_API_TOKEN=…   # localStorage.la_dex_token
 ```
 
-Both are wallet-minted sessions and last days. A Privy **access** token is also accepted by the
-workspace, and is what the dashboard itself signs in with, but it lapses within the hour so it is
-not what belongs in a configured credential. There is no Privy *identity* token to look for on
-liveagents.org: that setting is off for the app, which is also why the platform's shared-identity
-cookie is never written and the console hands its session over in a URL fragment instead.
+The two come from different places on purpose, and it is worth knowing why.
+
+`la_dex_token` is a session the exchange minted and holds. It lasts days and copying it is fine.
+
+`la_terminal_token` is **not** the matching value, though it sits beside it under a name that
+suggests it is. It is the Privy access token the console signed in with: renewed while a tab is
+open, and good for one hour on its own. Copied into a config file it works until roughly
+lunchtime and then returns 401 permanently, and copying a fresh one has the same ending. That is
+what workspace keys are for - a credential created deliberately, labelled, revocable, and not
+tied to anybody's browser being open. Create one on the **Connect Claude Code** page.
+
+There is no Privy *identity* token to look for on liveagents.org: that setting is off for the
+app, which is also why the platform's shared-identity cookie is never written and the console
+hands its session over in a URL fragment instead.
 
 Check both before promising anything:
 

@@ -194,6 +194,22 @@ def _quote(value: str) -> str:
     return quote(value, safe="")
 
 
+#: What to do about a 401, which is almost always the same thing.
+#:
+#: The workspace rejects a credential for one of two reasons and only one of them is interesting.
+#: A revoked workspace key is deliberate. A copied browser token is not: it is the console's Privy
+#: access token, it lives an hour, and until workspace keys existed it was the only thing there was
+#: to copy — so the overwhelmingly likely cause of a 401 here is a setup that was correct when it
+#: was made and expired the same afternoon. Saying so costs two lines and saves the hour somebody
+#: would otherwise spend checking a token that is not wrong, merely finished.
+REFRESH_ADVICE = (
+    "Set LIVEAGENTS_TERMINAL_TOKEN to a workspace key: sign in at the console, open "
+    "Connect Claude Code, and create one under Workspace keys. Keys start with `lat_`, "
+    "survive signing out, and are revocable. A token copied out of browser storage is a "
+    "browser session and expires within the hour."
+)
+
+
 def _error_from(response: httpx.Response) -> TerminalError:
     """The server's own message when it sent one, and the status when it did not."""
     detail = ""
@@ -205,6 +221,7 @@ def _error_from(response: httpx.Response) -> TerminalError:
         detail = (response.text or "").strip()[:300]
     if response.status_code == 401:
         detail = detail or "that credential was not accepted"
+        detail = f"{detail}. {REFRESH_ADVICE}"
     return TerminalError(
         detail or f"the workspace answered {response.status_code}", status=response.status_code)
 

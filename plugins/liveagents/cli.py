@@ -29,7 +29,8 @@ import argparse
 import json
 import os
 import sys
-from typing import Any, Dict, Iterator, Optional
+import time
+from typing import Any, Dict, Iterator, List, Optional
 
 from .config import EXCHANGE_TOKEN_ENV, TERMINAL_TOKEN_ENV, LiveAgentsConfig, MissingToken, load_config
 from .exchange import ExchangeClient, ExchangeError
@@ -262,8 +263,39 @@ def _cmd_whoami(args: argparse.Namespace) -> int:
     lines.append(f"admin: {'yes' if me.get('isAdmin') else 'no'}")
     lines.append(
         "claude: signed in" if ready else
-        "claude: NOT signed in — nothing will build until an admin sets the shared credential")
+        "claude: NOT signed in - nothing will build until an admin sets the shared credential")
+    lines.extend(_credential_lines(me))
     return _emit(args, me, "\n".join(lines))
+
+
+def _credential_lines(me: Dict[str, Any]) -> List[str]:
+    """What kind of credential is calling, and how long it has left.
+
+    A working setup and one that is about to break look identical from the outside, which is the
+    whole problem this reports on. A browser session answers every call correctly right up to the
+    minute it stops, and the failure then lands in the middle of a build rather than at the start
+    of one. So the kind is printed always, and the remaining life whenever it is knowable.
+    """
+    kind = me.get("credential")
+    if kind == "key":
+        return [f"credential: workspace key {me.get('keyId') or ''}".rstrip()]
+    if kind is None:
+        # An older workspace that does not report this. Nothing useful to say, and a guess here
+        # would be worse than silence.
+        return []
+
+    expires = me.get("expiresAt")
+    left = ""
+    if isinstance(expires, (int, float)) and expires > 0:
+        minutes = int((expires / 1000 - time.time()) // 60)
+        left = f", {minutes} minutes left" if minutes > 0 else ", expired"
+
+    return [
+        f"credential: browser session ({kind}){left}",
+        "  This is a session, not a configured credential: it ends when you sign out and",
+        "  within the hour regardless. For anything unattended create a workspace key at the",
+        "  console under Connect Claude Code.",
+    ]
 
 
 def _cmd_launch(args: argparse.Namespace) -> int:

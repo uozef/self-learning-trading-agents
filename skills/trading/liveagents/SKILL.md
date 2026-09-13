@@ -39,14 +39,18 @@ The `liveagents` plugin supplies `parabolic liveagents`, which every command her
 
 | Variable | Reaches | Where it comes from |
 |---|---|---|
-| `LIVEAGENTS_TERMINAL_TOKEN` | the Agent Terminal workspace | the console's `la_terminal_token`, minted by signing Agent Terminal's challenge with the account's embedded wallet |
-| `LIVEAGENTS_API_TOKEN` | the exchange | the console's `la_dex_token`, minted by exchanging the same Privy identity for an exchange session |
+| `LIVEAGENTS_TERMINAL_TOKEN` | the Agent Terminal workspace | a **workspace key**, created at the console under *Connect Claude Code -> Workspace keys*. Begins `lat_` |
+| `LIVEAGENTS_API_TOKEN` | the exchange | the console's `la_dex_token`, a session the exchange minted. Lasts days |
 
-Both are already in the console's own browser storage under those names, and both are
-wallet-minted sessions that last days. **Never tell somebody to fetch a Privy identity token for
-this**: it is issued only when that setting is on for the app, and on liveagents.org it is not.
-A Privy access token does work against the workspace but lapses within the hour, so it is not
-what belongs in a configured credential.
+**Never tell somebody to copy `la_terminal_token` out of browser storage.** It looks like the
+value that belongs in the first row and is not one: it is the Privy access token the console
+signed in with, renewed while a tab is open and good for an hour by itself. A machine configured
+from it works until roughly lunchtime and then answers 401 forever, and re-copying it produces
+the same result. A workspace key is the credential for anything that is not a browser - it is
+created deliberately, survives signing out, and is revoked by name from the same panel.
+
+Never go looking for a Privy identity token either: it is issued only when that setting is on for
+the app, and on liveagents.org it is not.
 
 Addresses are settings, not credentials: `plugins.entries.liveagents.settings.terminal_url`,
 `.exchange_url` and `.console_url` in `config.yaml`.

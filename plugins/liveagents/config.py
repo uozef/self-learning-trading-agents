@@ -13,20 +13,30 @@ Two hosts, two jobs, and the split is the same one Agent Terminal makes:
 URLs are behaviour, so they are settings under ``plugins.entries.liveagents.settings``. Tokens are
 credentials, so they come from the environment:
 
-* ``LIVEAGENTS_TERMINAL_TOKEN`` — a bearer the workspace accepts.
+* ``LIVEAGENTS_TERMINAL_TOKEN`` — a workspace key (``lat_...``), or any bearer the workspace
+  accepts.
 * ``LIVEAGENTS_API_TOKEN`` — the exchange session. The same variable name the workspace's own
   client reads, so a machine already set up for one is set up for both.
 
-**The console already holds both.** It signs Agent Terminal's challenge with the account's
-embedded wallet and exchanges the same Privy identity for an exchange session, keeping the
-results in its own storage as ``la_terminal_token`` and ``la_dex_token``. Those are the values to
-copy; they are wallet-minted sessions and last days.
+**The two are not the same kind of thing, and that is the thing to know.**
 
-A Privy **access** token is also accepted by the workspace, and is what the dashboard itself signs
-in with — but it expires in about an hour, so it is not what belongs in a configured credential.
-Do not go looking for a Privy *identity* token: it exists only when that is switched on for the
-app, and on liveagents.org it is not, which is why the platform's shared-identity cookie is never
-written.
+``LIVEAGENTS_API_TOKEN`` is the console's ``la_dex_token``: a session the exchange minted and
+holds, good for days, and fine to copy.
+
+``LIVEAGENTS_TERMINAL_TOKEN`` wants a **workspace key** — a credential beginning ``lat_``, created
+at the console under *Connect Claude Code → Workspace keys*. It is made on purpose, carries a
+label, survives signing out, and is revoked by name.
+
+What is *not* wanted is the console's ``la_terminal_token``. That looks like the matching value
+and is not one: it is the Privy access token the browser signed in with, renewed while a tab is
+open and dead within the hour on its own. Copying it produces a setup that works, then returns
+401 for the rest of time, and copying it again produces the same setup. It was the only thing
+there was to copy before workspace keys existed, which is why so many machines are configured
+that way.
+
+Do not go looking for a Privy *identity* token either: it exists only when that is switched on
+for the app, and on liveagents.org it is not, which is why the platform's shared-identity cookie
+is never written.
 """
 
 from __future__ import annotations
@@ -60,9 +70,11 @@ class LiveAgentsConfig:
     def require_terminal_token(self) -> str:
         if not self.terminal_token:
             raise MissingToken(
-                f"No Agent Terminal credential. Set {TERMINAL_TOKEN_ENV} to a token the workspace "
-                f"accepts — the Privy identity token from a {self.console_url} sign-in is one — or "
-                "pass --token.")
+                f"No Agent Terminal credential. Set {TERMINAL_TOKEN_ENV} to a workspace key, or "
+                f"pass --token. Create one at {self.console_url} under Connect Claude Code -> "
+                "Workspace keys; it begins `lat_` and does not expire. Do not copy "
+                "la_terminal_token out of browser storage: that is a browser session and lasts "
+                "under an hour.")
         return self.terminal_token
 
     def require_exchange_token(self) -> str:
