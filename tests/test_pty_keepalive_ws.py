@@ -81,8 +81,14 @@ async def test_stalled_input_closes_only_the_keepalive_socket(
     from starlette.testclient import TestClient
     from starlette.websockets import WebSocketDisconnect
 
+    from hermes_cli.pty_session import CLEAR_FOR_REPLAY
+
     client = TestClient(web_server.app)
     with client.websocket_connect("/api/pty?attach=TOK1") as ws:
+        # Every attach opens with the replay frame, empty buffer or not, so that a terminal which
+        # reconnected without reloading is cleared before it is written to. Take it off the queue
+        # or it is what `receive_bytes` returns instead of the close.
+        assert ws.receive_bytes() == CLEAR_FOR_REPLAY
         bridge = pty_keepalive_harness.bridges[0]
         bridge.accept_input = False
         ws.send_bytes(b"input")

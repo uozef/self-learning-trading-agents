@@ -67,7 +67,7 @@ class FakeWS:
 
 @pytest.mark.asyncio
 async def test_attach_replays_buffer_then_streams_live():
-    from hermes_cli.pty_session import PtySession
+    from hermes_cli.pty_session import CLEAR_FOR_REPLAY, PtySession
     bridge = FakeBridge([b"hello ", b"world", None])
     s = PtySession("k", bridge, buffer_cap=1024, read_timeout=0.01)
     await s.start()
@@ -75,14 +75,14 @@ async def test_attach_replays_buffer_then_streams_live():
     ws = FakeWS()
     await s.attach(ws)
     replay = b"".join(p for kind, p in ws.sent if kind == "bytes")
-    assert replay == b"hello world"
+    assert replay == CLEAR_FOR_REPLAY + b"hello world"
     await s.close()
 
 
 @pytest.mark.asyncio
 async def test_reattach_can_force_complete_tui_redraw_after_replay():
     """A fresh terminal cannot reconstruct a differential ANSI tail alone."""
-    from hermes_cli.pty_session import PtySession
+    from hermes_cli.pty_session import CLEAR_FOR_REPLAY, PtySession
 
     bridge = FakeBridge([b"partial differential frame", b""])
     s = PtySession("k", bridge, buffer_cap=1024, read_timeout=0.01)
@@ -93,7 +93,7 @@ async def test_reattach_can_force_complete_tui_redraw_after_replay():
     assert await s.attach(ws, force_redraw=True) is True
 
     replay = b"".join(p for kind, p in ws.sent if kind == "bytes")
-    assert replay == b"partial differential frame"
+    assert replay == CLEAR_FOR_REPLAY + b"partial differential frame"
     assert bytes(bridge.written) == b"\x0c"
     await s.close()
 
@@ -195,7 +195,7 @@ async def test_superseded_failed_write_does_not_kill_replacement_session():
 
 @pytest.mark.asyncio
 async def test_detach_keeps_draining_into_buffer():
-    from hermes_cli.pty_session import PtySession
+    from hermes_cli.pty_session import CLEAR_FOR_REPLAY, PtySession
     bridge = FakeBridge([b"one", b"", b"two"])
     s = PtySession("k", bridge, buffer_cap=1024, read_timeout=0.01)
     await s.start()
@@ -208,7 +208,7 @@ async def test_detach_keeps_draining_into_buffer():
     ws2 = FakeWS()
     await s.attach(ws2)
     replay = b"".join(p for kind, p in ws2.sent if kind == "bytes")
-    assert replay == b"onetwo"
+    assert replay == CLEAR_FOR_REPLAY + b"onetwo"
     await s.close()
 
 
@@ -338,3 +338,31 @@ async def test_close_all_survives_key_popped_by_concurrent_reap():
 
     assert not reg._sessions
     assert all(b.closed for b in bridges)
+
+
+@pytest.mark.asyncio
+async def test_reconnect_does_not_stack_a_second_copy_of_the_session():
+    """A terminal that never reloaded gets the replay on a cleared screen, not appended.
+
+    `pty-reconnect.ts` reconnects on tab-return, focus and network recovery without reloading the
+    page, so the xterm receiving the second replay already holds the first. Without the clear the
+    whole session - the startup banner most visibly - is printed once per reconnect.
+    """
+    from hermes_cli.pty_session import CLEAR_FOR_REPLAY, PtySession
+
+    bridge = FakeBridge([b"BANNER", b""])
+    s = PtySession("k", bridge, buffer_cap=1024, read_timeout=0.01)
+    await s.start()
+    await asyncio.sleep(0.05)
+
+    ws = FakeWS()
+    await s.attach(ws)
+    await s.attach(ws, force_redraw=True)
+
+    frames = [p for kind, p in ws.sent if kind == "bytes"]
+    assert len(frames) == 2
+    # Every replay is self-contained: it wipes screen and scrollback before writing.
+    for frame in frames:
+        assert frame.startswith(CLEAR_FOR_REPLAY)
+        assert frame == CLEAR_FOR_REPLAY + b"BANNER"
+    await s.close()

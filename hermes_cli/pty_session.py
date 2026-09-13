@@ -14,6 +14,24 @@ WS_CLOSE_PROCESS_EXITED = 4410
 WS_CLOSE_SUPERSEDED = 4409
 TUI_FORCE_REDRAW = b"\x0c"
 
+#: What a replay has to land on.
+#:
+#: ``attach`` is handed either a brand new browser terminal or one that has been on screen for an
+#: hour. ``web/src/lib/pty-reconnect.ts`` reconnects on tab-return, window focus and network
+#: recovery *without reloading the page*, and ``ChatPage``'s ``onopen`` writes whatever arrives
+#: straight into the existing xterm. Replaying the whole ring buffer into a terminal that already
+#: holds it prints the entire session a second time - which is why the startup banner appeared
+#: once per reconnect, each copy laid out for whatever width the terminal had when it was drawn.
+#:
+#: Neither side can tell a first replay from a repeat: the buffer is the same bytes and the socket
+#: is a new socket either way. So the replay stops depending on the answer and always lands on an
+#: empty terminal.
+#:
+#: ED 3 is the load-bearing part. ``ESC[2J`` erases the screen and deliberately keeps the
+#: scrollback - Ink's own ``forceRedraw`` relies on that - and the scrollback is exactly where the
+#: duplicates were piling up.
+CLEAR_FOR_REPLAY = b"\x1b[H\x1b[2J\x1b[3J"
+
 
 class RingBuffer:
     """Keeps only the most recent ``capacity`` bytes appended to it."""
@@ -107,8 +125,11 @@ class PtySession:
         self._attach_generation += 1
         self.attached = True
         self.last_detached_at = None
-        if snap := self.buffer.snapshot():
-            await ws.send_bytes(snap)
+        # One frame, so a terminal cannot paint the stale tail it already had in the gap between
+        # the clear and the replay. Sent even when the buffer is empty: on a reconnect that is
+        # still a terminal holding a previous replay, and on a first attach it costs three bytes
+        # against a screen that is already blank.
+        await ws.send_bytes(CLEAR_FOR_REPLAY + self.buffer.snapshot())
         if force_redraw:
             return await self.write(ws, TUI_FORCE_REDRAW)
         return True
