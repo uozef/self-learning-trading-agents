@@ -20,18 +20,23 @@ export function SidebarFooter({ status }: SidebarFooterProps) {
         {status?.version != null ? `v${status.version}` : "—"}
       </Typography>
 
-      <a
-        href="https://nousresearch.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={cn(
-          "font-sans text-display text-xs tracking-[0.12em] text-midground",
-          "transition-opacity hover:opacity-90",
-          "focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-midground/40",
-        )}
-      >
-        {t.app.footer.org}
-      </a>
+      {/* The organisation credit, and the link to it, only when there is one.
+          An empty label left an invisible but focusable link in the tab order,
+          pointing somewhere this deployment has nothing to do with. */}
+      {t.app.footer.org ? (
+        <a
+          href="https://nousresearch.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(
+            "font-sans text-display text-xs tracking-[0.12em] text-midground",
+            "transition-opacity hover:opacity-90",
+            "focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-midground/40",
+          )}
+        >
+          {t.app.footer.org}
+        </a>
+      ) : null}
     </div>
   );
 }

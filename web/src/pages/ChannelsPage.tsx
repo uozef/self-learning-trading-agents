@@ -1148,7 +1148,7 @@ function TelegramOnboardingPanel({
     setDetectedOwnerId(null);
     setNewAllowedId("");
     try {
-      const res = await api.startTelegramOnboarding({ bot_name: "Recursive Self Learning Agents" });
+      const res = await api.startTelegramOnboarding({ bot_name: "Parabolic Agents" });
       const dataUrl = await QRCode.toDataURL(res.qr_payload, {
         errorCorrectionLevel: "M",
         margin: 1,

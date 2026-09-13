@@ -50,12 +50,12 @@ export const ar = defineLocale({
   },
 
   app: {
-    brand: "Recursive Self Learning Agents",
-    brandShort: "RSLA",
+    brand: "Parabolic Agents",
+    brandShort: "Parabolic",
     closeNavigation: "إغلاق التنقل",
     closeModelTools: "إغلاق النموذج والأدوات",
     footer: {
-      org: "Nous Research",
+      org: "",
     },
     activeSessionsLabel: "الجلسات النشطة:",
     gatewayStatusLabel: "حالة البوابة:",

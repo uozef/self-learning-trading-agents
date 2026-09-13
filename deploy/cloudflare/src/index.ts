@@ -39,6 +39,40 @@ export interface Env {
    */
   RSLA_CLAUDE_CODE_OAUTH_TOKEN?: string;
   RSLA_ANTHROPIC_API_KEY?: string;
+  /**
+   * The Privy app the whole of liveagents.org signs in to. Setting it turns on
+   * the dashboard's Privy auth provider, so a console sign-in is a sign-in
+   * here and nothing asks for a password.
+   *
+   * It MUST be byte-identical to the console's `VITE_PRIVY_APP_ID` and Agent
+   * Terminal's `PRIVY_APP_ID`. Two ids that merely look alike produce two
+   * accounts for the same person and tokens each side rejects as minted for
+   * somebody else.
+   */
+  RSLA_PRIVY_APP_ID?: string;
+  /**
+   * The LiveAgents platform credentials the trading commands need.
+   *
+   * Two hosts, two tokens, because they answer different questions. The
+   * workspace at terminal.liveagents.org writes agents and replays them; the
+   * exchange at dex.liveagents.org owns the deployed ones.
+   *
+   * Both are minted by the console, which already holds them: it signs the
+   * Agent Terminal challenge with the account's embedded wallet and exchanges
+   * the same Privy identity for an exchange session. They live in the console's
+   * own storage as `la_terminal_token` and `la_dex_token`.
+   *
+   * They are wallet-minted sessions rather than Privy access tokens, which is
+   * what makes a secret the right home for them: a Privy access token lasts
+   * about an hour, so baking one in would stop working before the day was out.
+   */
+  RSLA_LIVEAGENTS_TERMINAL_TOKEN?: string;
+  RSLA_LIVEAGENTS_API_TOKEN?: string;
+  /**
+   * Enables POST /__rsla/restart. Unset (the default) and that route 404s, so it
+   * adds no reachable surface until an operator opts in.
+   */
+  RSLA_ADMIN_TOKEN?: string;
 }
 
 const GATE_COOKIE = "rsla_gate";
@@ -50,21 +84,44 @@ export class AgentContainer extends Container<Env> {
   defaultPort = 8080;
   sleepAfter = SLEEP_AFTER;
 
+  /**
+   * Only the variables that actually carry a value.
+   *
+   * An unset secret used to arrive as an empty string, which is not the same
+   * thing as absent: the agent reported both LiveAgents tokens as "present but
+   * 0 chars" and told its user they were configured-but-blank, when nobody had
+   * configured them at all. Absent says what is true, and it lets a value
+   * written to the container's own `.env` win rather than sit behind an empty
+   * variable of the same name.
+   */
+  private static present(vars: Record<string, string | undefined>): Record<string, string> {
+    return Object.fromEntries(
+      Object.entries(vars).filter(([, v]) => typeof v === "string" && v.length > 0),
+    ) as Record<string, string>;
+  }
+
   // The dashboard boots a Python process, a venv and an s6 supervision tree,
   // so the first request after a cold start waits a while.
-  override envVars = {
+  override envVars = AgentContainer.present({
     HERMES_DASHBOARD_HOST: "0.0.0.0",
     HERMES_DASHBOARD_PORT: "8080",
     HERMES_DASHBOARD_BASIC_AUTH_USERNAME: this.env.RSLA_DASHBOARD_USERNAME ?? "",
     HERMES_DASHBOARD_BASIC_AUTH_PASSWORD: this.env.RSLA_DASHBOARD_PASSWORD ?? "",
     HERMES_DASHBOARD_BASIC_AUTH_SECRET: this.env.RSLA_DASHBOARD_SECRET ?? "",
     HERMES_DASHBOARD_PUBLIC_URL: this.env.RSLA_PUBLIC_URL ?? "",
+    // Unset means the provider does not register and the dashboard falls back
+    // to the password it already has.
+    HERMES_DASHBOARD_PRIVY_APP_ID: this.env.RSLA_PRIVY_APP_ID ?? "",
+    // The names the `liveagents` plugin reads. Unset means the trading commands
+    // name the missing token, and a value in the container's `.env` still wins.
+    LIVEAGENTS_TERMINAL_TOKEN: this.env.RSLA_LIVEAGENTS_TERMINAL_TOKEN ?? "",
+    LIVEAGENTS_API_TOKEN: this.env.RSLA_LIVEAGENTS_API_TOKEN ?? "",
     // The agent's Claude credential. The connector reads the Claude auth token
     // ahead of the Console API key, so passing both leaves the subscription in
     // charge. Empty values are fine: the agent treats a blank env var as absent.
     CLAUDE_CODE_OAUTH_TOKEN: this.env.RSLA_CLAUDE_CODE_OAUTH_TOKEN ?? "",
     ANTHROPIC_API_KEY: this.env.RSLA_ANTHROPIC_API_KEY ?? "",
-  };
+  });
 
   override onStart() {
     console.log("agent container started");
@@ -72,6 +129,21 @@ export class AgentContainer extends Container<Env> {
 
   override onStop({ exitCode, reason }: { exitCode: number; reason: string }) {
     console.log(`agent container stopped: exit=${exitCode} reason=${reason}`);
+  }
+
+  /**
+   * Stop the container so the next request starts it again.
+   *
+   * `envVars` is read when the container starts, not per request, so a secret
+   * added after an instance is already up never reaches the agent — and a deploy
+   * that changes no container config performs no rollout, so the stale instance
+   * simply keeps running until it idles out. This is the supported way to apply
+   * a credential change now instead of waiting for `sleepAfter`.
+   */
+  async restartForConfigChange(): Promise<string> {
+    const before = await this.getState();
+    await this.destroy();
+    return before?.status ?? "unknown";
   }
 
   override onError(error: unknown) {
@@ -173,6 +245,25 @@ export default {
     }
 
     const setCookies: string[] = [];
+
+    // Applies a credential change without waiting for the idle timeout. Carries
+    // its own auth and is absent unless RSLA_ADMIN_TOKEN is set, so it sits
+    // ahead of the visitor gate without widening what an anonymous caller can do.
+    if (url.pathname === "/__rsla/restart") {
+      const adminToken = env.RSLA_ADMIN_TOKEN ?? "";
+      if (!adminToken || request.method !== "POST") {
+        return new Response("Not found", { status: 404 });
+      }
+      if (!timingSafeEqual(request.headers.get("x-rsla-admin") ?? "", adminToken)) {
+        return new Response("Forbidden", { status: 403 });
+      }
+      const target = url.searchParams.get("instance") || "rsla-default";
+      const previous = await getContainer(env.AGENT, target).restartForConfigChange();
+      return new Response(
+        `stopped ${target} (was ${previous}); it restarts on the next request\n`,
+        { headers: { "content-type": "text/plain; charset=utf-8" } },
+      );
+    }
 
     if (gatePassword) {
       const expected = await gateCookieValue(gatePassword);

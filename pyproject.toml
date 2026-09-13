@@ -392,6 +392,10 @@ build-backend = "setuptools.build_meta"
 hermes = "hermes_cli.main:main"
 hermes-agent = "run_agent:main"
 hermes-acp = "acp_adapter.entry:main"
+# The product's own name for the same entry point. Both are installed: the
+# documentation and the shipped skills invoke `parabolic`, while `hermes` keeps
+# working for anything — a script, a habit, a bookmark — that predates the name.
+parabolic = "hermes_cli.main:main"
 
 [tool.uv]
 override-dependencies = [

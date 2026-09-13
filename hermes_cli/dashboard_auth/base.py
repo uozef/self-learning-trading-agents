@@ -104,13 +104,35 @@ class DashboardAuthProvider(ABC):
     Subclasses MUST set ``name`` (stable lowercase id) and ``display_name``. Capability flags:
     ``supports_password`` (credential form + ``complete_password_login``; OAuth methods may be
     ``NotImplementedError`` stubs), ``supports_token`` (``verify_token`` for the token-auth seam),
-    ``supports_session`` (False for token-only credentials such as drain, never offered a login).
+    ``supports_session`` (False for token-only credentials such as drain, never offered a login),
+    ``supports_sso_handoff`` (the session token is minted by a sibling application and handed
+    over, so there is no login flow here — see ``sso_handoff_hint``).
     """
     name: str = ""
     display_name: str = ""
     supports_password: bool = False
     supports_token: bool = False
     supports_session: bool = True
+    supports_sso_handoff: bool = False
+
+    def sso_handoff_hint(self) -> dict[str, str]:
+        """Where a handed-over token comes from (only read when ``supports_sso_handoff``).
+
+        ``cookie`` is the name a sibling application publishes the token under on a shared parent
+        domain, and ``console_url`` is where a visitor with no session is sent to get one; both
+        MAY be empty. The login page renders from this dict so nothing about a particular identity
+        product reaches core.
+        """
+        return {}
+
+    def sso_cookies_to_clear(self) -> tuple[str, ...]:
+        """Cookie names a sign-out must remove besides Hermes's own (default: none).
+
+        A shared session lives in cookies this origin did not set, and leaving a refresh token
+        behind lets the sibling SDK mint a new access token on the next page load and undo the
+        sign-out. Names only; the logout route owns the domain and path variants.
+        """
+        return ()
 
     @abstractmethod
     def start_login(self, *, redirect_uri: str) -> LoginStart: ...

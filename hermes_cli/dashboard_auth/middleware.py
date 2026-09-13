@@ -16,7 +16,7 @@ from urllib.parse import quote
 from fastapi import Request
 from fastapi.responses import JSONResponse, RedirectResponse, Response
 
-from hermes_cli.dashboard_auth import list_session_providers
+from hermes_cli.dashboard_auth import list_session_providers, list_sso_handoff_providers
 from hermes_cli.dashboard_auth.audit import AuditEvent, audit_log
 from hermes_cli.dashboard_auth.base import ProviderError, RefreshExpiredError
 from hermes_cli.dashboard_auth.cookies import (
@@ -36,7 +36,7 @@ _log = logging.getLogger(__name__)
 # the trailing slash matches ``/assets/foo.css`` but not ``/assetsleak``.
 _GATE_PUBLIC_PREFIXES: tuple[str, ...] = (
     "/auth/login", "/auth/callback", "/auth/native/authorize", "/auth/native/token",
-    "/auth/native/refresh", "/auth/password-login", "/auth/logout", "/login",
+    "/auth/native/refresh", "/auth/password-login", "/auth/sso-session", "/auth/logout", "/login",
     "/api/auth/providers", "/api/mcp/oauth/callback/",
     "/assets/", "/favicon.ico", "/ds-assets/", "/fonts/", "/fonts-terminal/")
 
@@ -92,6 +92,10 @@ def _auto_sso_response(request: Request) -> Response | None:
     providers = list_session_providers()
     if len(providers) != 1 or getattr(providers[0], "supports_password", False):
         return None
+    # A handoff provider has no IDP to bounce to: its token is minted by a sibling application
+    # and the login page's bootstrap adopts it. Bouncing would 500 on ``start_login``.
+    if getattr(providers[0], "supports_sso_handoff", False):
+        return None
     provider = providers[0]
     prefix = prefix_from_request(request)
     next_param = _safe_next_target(request)
@@ -103,6 +107,58 @@ def _auto_sso_response(request: Request) -> Response | None:
     audit_log(AuditEvent.LOGIN_START, provider=provider.name, reason="auto_sso",
               ip=_client_ip(request))
     return resp
+
+
+def _adopt_shared_session(request: Request):
+    """Adopt a session from a sibling application's shared cookie. ``(Session, provider)`` or None.
+
+    A handoff provider's token is minted elsewhere and published on the parent domain, which means
+    this origin can simply read it. Doing that here rather than only in the login page's script is
+    what removes the flash: without it, an already-signed-in visitor is bounced to ``/login``,
+    watches a password form paint, and is redirected back a moment later — which looks exactly like
+    being asked for a password they had already given somewhere else.
+
+    Also the refresh path for these providers. A Privy token rotates, and the provider deliberately
+    refuses ``refresh_session`` because it holds nothing of its own to rotate; re-reading the
+    cookie is the renewal.
+
+    Only providers that declare a cookie are consulted, and the token is verified exactly as it is
+    on every other request. A cookie that fails verification is treated as absent: it is most often
+    simply stale, and the login page is still a way in.
+    """
+    for provider in list_sso_handoff_providers():
+        try:
+            name = (provider.sso_handoff_hint() or {}).get("cookie", "")
+        except Exception:  # noqa: BLE001 - a broken provider must not break the gate
+            continue
+        if not name:
+            continue
+        token = request.cookies.get(name)
+        if not token:
+            continue
+        try:
+            session = provider.verify_session(access_token=token)
+        except ProviderError:
+            # Uncertain, not rejected. Another provider may still recognise the visitor, and the
+            # caller falls through to the login page rather than reporting an outage it cannot
+            # confirm.
+            continue
+        if session is not None:
+            return session, provider.name
+    return None
+
+
+async def _serve_adopted(request: Request, call_next, session, provider: str) -> Response:
+    """Serve this request under a just-adopted session and write the cookies back."""
+    request.state.session = session
+    response = await call_next(request)
+    set_session_cookies(
+        response, access_token=session.access_token, refresh_token=session.refresh_token,
+        access_token_expires_in=_expires_in_seconds(session), use_https=detect_https(request),
+        prefix=prefix_from_request(request), provider=provider)
+    audit_log(AuditEvent.LOGIN_SUCCESS, provider=provider, user_id=session.user_id,
+              email=session.email, org_id=session.org_id, ip=_client_ip(request))
+    return response
 
 
 def _verify_access_token(
@@ -172,6 +228,11 @@ async def gated_auth_middleware(
     at, _rt = read_session_cookies(request)
     provider_hint = read_session_provider(request)
     if not at and not _rt:
+        # A sibling application on the same parent domain may already have signed this visitor
+        # in, in which case there is nothing to ask them for.
+        adopted = _adopt_shared_session(request)
+        if adopted is not None:
+            return await _serve_adopted(request, call_next, *adopted)
         # No session at all: try the silent portal bounce before /login.
         auto = _auto_sso_response(request)
         return auto if auto is not None else _unauth_response(request, reason="no_cookie")
@@ -192,6 +253,11 @@ async def gated_auth_middleware(
             # Uncertain (provider unreachable), not rejected: keep the cookies.
             return unreachable_response(str(e))
         if refreshed is None:
+            # A handoff provider holds no refresh token of its own: re-reading the shared cookie
+            # IS the renewal, so a rotated token is picked up here instead of forcing a re-login.
+            adopted = _adopt_shared_session(request)
+            if adopted is not None:
+                return await _serve_adopted(request, call_next, *adopted)
             return _session_expired_response(request)
         return await _serve_refreshed(request, call_next, *refreshed)
 

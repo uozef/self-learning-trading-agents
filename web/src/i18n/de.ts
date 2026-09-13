@@ -50,12 +50,12 @@ export const de: Translations = {
   },
 
   app: {
-    brand: "Recursive Self Learning Agents",
-    brandShort: "RSLA",
+    brand: "Parabolic Agents",
+    brandShort: "Parabolic",
     closeNavigation: "Navigation schließen",
     closeModelTools: "Modell und Werkzeuge schließen",
     footer: {
-      org: "Nous Research",
+      org: "",
     },
     activeSessionsLabel: "Aktive Sitzungen:",
     gatewayStatusLabel: "Gateway-Status:",

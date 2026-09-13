@@ -54,9 +54,15 @@ export function ArtLines({ lines }: { lines: [string, string][] }) {
 // Terminals can't scale glyphs, so "responsive" means picking a layout that
 // fits the available columns. Thresholds are picked so each tier reads
 // comfortably without forcing wrap or truncation drift on box-drawing edges.
-const TAG_FULL = 'Nous Research · Messenger of the Digital Gods'
-const TAG_MID = 'Messenger of the Digital Gods'
-const TAG_TINY = 'Nous Research'
+// The tagline comes from the theme's brand, so a skin that rebrands the agent
+// can carry its own or carry none. The narrower tiers are derived from it: the
+// part after the separator when there is one, then the part before. A brand
+// with no tagline renders no tagline row at all, at every width.
+const tagTiers = (full: string): [string, string, string] => {
+  const [head = '', ...rest] = full.split(' · ')
+  const tail = rest.join(' · ')
+  return [full, tail || head, head]
+}
 const HIDE_BELOW = 34
 const COMPACT_FROM = 58
 
@@ -94,7 +100,7 @@ function CompactBanner({ cols, t }: { cols: number; t: Theme }) {
   return (
     <Box flexDirection="column" height={3} marginBottom={1} width={w}>
       <Text color={t.color.primary}>{ruleIn(t.brand.name, w)}</Text>
-      <Text color={t.color.muted}>{centerIn(TAG_FULL, w)}</Text>
+      <Text color={t.color.muted}>{t.brand.tagline ? centerIn(t.brand.tagline, w) : ''}</Text>
       <Text color={t.color.primary}>{'─'.repeat(w)}</Text>
     </Box>
   )
@@ -105,6 +111,17 @@ export function Banner({ maxWidth, t }: { maxWidth?: number; t: Theme }) {
   const cols = Math.max(1, Math.min(term, maxWidth ?? term))
 
   if (cols < HIDE_BELOW) {
+    return null
+  }
+
+  // Nothing until the gateway's skin has landed.
+  //
+  // The skin arrives on the `ready` event, after the first paint. Rendering the
+  // built-in default in the meantime showed the stock brand and its gold for a
+  // frame before swapping to the deployment's own — a flash of the wrong
+  // product on every boot. A blank frame says nothing, which is correct, and it
+  // is the same frame the banner would have occupied anyway.
+  if (!t.skinApplied) {
     return null
   }
 
@@ -127,14 +144,16 @@ export function Banner({ maxWidth, t }: { maxWidth?: number; t: Theme }) {
           rowGap={0}
           widgets={[
             { children: <ArtLines lines={logoLines} />, id: 'banner-art' },
-            {
-              children: (
-                <Text color={t.color.muted} wrap="truncate-end">
-                  {t.brand.icon} {TAG_FULL}
-                </Text>
-              ),
-              id: 'banner-tagline'
-            }
+            ...(t.brand.tagline
+              ? [{
+                  children: (
+                    <Text color={t.color.muted} wrap="truncate-end">
+                      {t.brand.icon} {t.brand.tagline}
+                    </Text>
+                  ),
+                  id: 'banner-tagline'
+                }]
+              : [])
           ]}
         />
       </Box>
@@ -156,7 +175,8 @@ export function Banner({ maxWidth, t }: { maxWidth?: number; t: Theme }) {
   }
 
   const name = cols >= 52 ? t.brand.name : (t.brand.name.split(' ')[0] ?? t.brand.name)
-  const tag = cols >= 64 ? TAG_FULL : cols >= 46 ? TAG_MID : TAG_TINY
+  const [tagFull, tagMid, tagTiny] = tagTiers(t.brand.tagline)
+  const tag = cols >= 64 ? tagFull : cols >= 46 ? tagMid : tagTiny
 
   return (
     <Box flexDirection="column" marginBottom={1}>
@@ -355,7 +375,7 @@ export function SessionPanel({ info, maxWidth, sid, t }: SessionPanelProps) {
 
       <Text color={t.color.accent}>
         {info.model.split('/').pop()}
-        <Text color={t.color.muted}> · Nous Research</Text>
+        {t.brand.vendor ? <Text color={t.color.muted}> · {t.brand.vendor}</Text> : null}
       </Text>
 
       <Text color={t.color.muted} wrap="truncate-end">
@@ -387,7 +407,7 @@ export function SessionPanel({ info, maxWidth, sid, t }: SessionPanelProps) {
         <Box flexDirection="column" marginBottom={1}>
           <Text color={t.color.accent} wrap="truncate-end">
             {info.model.split('/').pop()}
-            <Text color={t.color.muted}> · Nous Research</Text>
+            {t.brand.vendor ? <Text color={t.color.muted}> · {t.brand.vendor}</Text> : null}
           </Text>
           <Text color={t.color.muted} wrap="truncate-end">
             {info.cwd || process.cwd()}

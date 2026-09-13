@@ -93,6 +93,14 @@ def list_session_providers() -> List[DashboardAuthProvider]:
     return [p for p in list_providers() if getattr(p, "supports_session", True)]
 
 
+def list_sso_handoff_providers() -> List[DashboardAuthProvider]:
+    """Session providers whose token is minted elsewhere and handed over (``supports_sso_handoff``).
+
+    ``POST /auth/sso-session`` accepts a token only for these, so a provider with a real login
+    flow can never be driven by a token a page supplies; empty => that route 404s."""
+    return [p for p in list_session_providers() if getattr(p, "supports_sso_handoff", False)]
+
+
 def register_global_provider(provider: DashboardAuthProvider) -> None:
     """Register a host-owned provider in the process-global slot (upsert). The registry is shared
     across every profile one dashboard process serves, so these outlive any per-home plugin

@@ -90,6 +90,7 @@ const sidebars: SidebarsConfig = {
             'user-guide/features/plugins',
             'user-guide/features/built-in-plugins',
             'user-guide/features/plugin-catalog',
+            'user-guide/features/liveagents',
           ],
         },
         {

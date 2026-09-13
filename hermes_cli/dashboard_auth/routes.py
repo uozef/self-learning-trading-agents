@@ -8,6 +8,7 @@ allowlists the public ones.
   GET  /auth/native/authorize  RFC 8252 native-app (desktop) login start
   GET  /auth/callback          completes login, sets session cookies
   POST /auth/password-login    username/password login (JSON)
+  POST /auth/sso-session       adopt a sibling app's handed-over token as this origin's cookie
   POST /auth/logout            clears cookies, best-effort revoke
   POST /auth/native/token      loopback code -> bearer tokens
   POST /auth/native/refresh    desktop-held refresh token rotation
@@ -29,14 +30,15 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 from hermes_cli.dashboard_auth import (
-    get_provider, list_providers, list_session_providers, native_flow)
+    get_provider, list_providers, list_session_providers, list_sso_handoff_providers,
+    native_flow)
 from hermes_cli.dashboard_auth import prefix as _prefix_mod
 from hermes_cli.dashboard_auth.audit import AuditEvent, audit_log
 from hermes_cli.dashboard_auth.base import (
     InvalidCodeError, InvalidCredentialsError, ProviderError, RefreshExpiredError, Session)
 from hermes_cli.dashboard_auth.cookies import (
-    clear_pkce_cookie, clear_session_cookies, clear_sso_attempt_cookie, detect_https,
-    parse_pkce_payload, read_pkce_cookie, read_session_cookies, set_pkce_cookie,
+    clear_pkce_cookie, clear_session_cookies, clear_shared_cookies, clear_sso_attempt_cookie,
+    detect_https, parse_pkce_payload, read_pkce_cookie, read_session_cookies, set_pkce_cookie,
     set_session_cookies)
 from hermes_cli.dashboard_auth.login_page import (
     render_login_html, render_native_provider_choice_html)
@@ -130,6 +132,19 @@ def _finish_native_login(
     return f"{pending.redirect_uri}{sep}{query}"
 
 
+def _shared_cookie_names(provider) -> tuple:
+    """``sso_cookies_to_clear()`` for one provider; empty when it declares none or misbehaves.
+
+    A provider that raises here must not be able to break a sign-out: logging out is the one
+    operation that has to work when everything else is wrong.
+    """
+    try:
+        return tuple(provider.sso_cookies_to_clear() or ())
+    except Exception as e:  # noqa: BLE001 - a broken provider must not block logout
+        _log.warning("dashboard-auth: sso_cookies_to_clear on %r failed: %s", provider.name, e)
+        return ()
+
+
 def _login_failure(request: Request, provider: str, reason: str, **extra) -> None:
     _audit(request, AuditEvent.LOGIN_FAILURE, provider=provider, reason=reason, **extra)
 
@@ -186,7 +201,8 @@ async def api_auth_providers() -> Any:
         return JSONResponse({"detail": "no auth providers registered"}, status_code=503)
     return {"providers": [
         {"name": p.name, "display_name": p.display_name,
-         "supports_password": bool(getattr(p, "supports_password", False))}
+         "supports_password": bool(getattr(p, "supports_password", False)),
+         "supports_sso_handoff": bool(getattr(p, "supports_sso_handoff", False))}
         for p in providers]}
 
 
@@ -200,7 +216,9 @@ async def auth_login(request: Request, provider: str, next: str = ""):
     if not getattr(p, "supports_session", True):
         raise _http(404, f"Provider does not support interactive login: {provider!r}")
     safe_next = _validate_post_login_target(next)
-    if getattr(p, "supports_password", False):
+    # Neither shape has an IDP to bounce to: a password provider renders a form and a handoff
+    # provider adopts a token a sibling application minted. Both live on the login page.
+    if getattr(p, "supports_password", False) or getattr(p, "supports_sso_handoff", False):
         login_url = f"{_prefix(request)}/login"
         if safe_next:
             login_url = f"{login_url}?next={quote(safe_next, safe='')}"
@@ -416,6 +434,58 @@ async def auth_password_login(request: Request, body: _PasswordLoginBody):
     return resp
 
 
+class _SsoSessionBody(BaseModel):
+    token: str
+    next: str = ""
+
+
+@router.post("/auth/sso-session", name="auth_sso_session")
+async def auth_sso_session(request: Request, body: _SsoSessionBody):
+    """Adopt a session token minted by a sibling application as this origin's cookie.
+
+    For ``supports_sso_handoff`` providers only. A shared sign-in lives in a token some other
+    application on the same parent domain already holds; this origin's session is an HttpOnly
+    cookie, which that application can neither read nor write. So the token is handed over here
+    and verified on the spot, exactly as it is verified on every subsequent request.
+
+    It grants nothing that holding the token did not already grant: the same bearer would be
+    accepted by the gate directly, the signature and audience are checked against the provider's
+    own keys, and the cookie's lifetime is the token's own expiry — no session of our minting and
+    nothing to revoke separately. Answers ``{"ok": true, "next": <path>}``; 404 when no provider
+    accepts handoffs (so the route adds no surface until one is configured), 401 when the token
+    is not verifiable, 503 when the provider is unreachable.
+    """
+    providers = list_sso_handoff_providers()
+    if not providers:
+        raise _http(404, "Not found")
+    token = body.token.strip()
+    if not token:
+        _login_failure(request, "sso", "no_token")
+        raise _http(401, "Unauthorized")
+
+    unreachable = ""
+    for p in providers:
+        try:
+            session = p.verify_session(access_token=token)
+        except ProviderError as e:
+            # Uncertain rather than rejected: remember it and let a sibling provider try.
+            unreachable = str(e)
+            continue
+        if session is None:
+            continue
+        target, _native = _complete_login(
+            request, p.name, session, broker_state="", next_raw=body.next)
+        resp = JSONResponse({"ok": True, "next": target})
+        _set_session(resp, request, session)
+        return resp
+
+    if unreachable:
+        _login_failure(request, "sso", "provider_unreachable")
+        raise _http(503, f"Provider unreachable: {unreachable}")
+    _login_failure(request, "sso", "invalid_handoff_token")
+    raise _http(401, "Unauthorized")
+
+
 @router.post("/auth/logout", name="auth_logout")
 async def auth_logout(request: Request):
     _at, rt = read_session_cookies(request)
@@ -432,6 +502,17 @@ async def auth_logout(request: Request):
     resp = RedirectResponse(url=f"{prefix}/login", status_code=302)
     clear_session_cookies(resp, prefix=prefix)
     clear_pkce_cookie(resp, use_https=detect_https(request), prefix=prefix)
+    # A shared sign-in also lives in cookies this origin did not set. Ours alone would leave the
+    # sibling application's session intact, and the next page load would adopt it again — so the
+    # sign-out would not stick and the next person at a shared browser would arrive signed in.
+    shared = tuple(
+        name
+        for provider in list_sso_handoff_providers()
+        for name in _shared_cookie_names(provider))
+    if shared:
+        clear_shared_cookies(
+            resp, shared, host=request.url.hostname or "", use_https=detect_https(request),
+            prefix=prefix)
     return resp
 
 

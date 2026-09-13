@@ -236,6 +236,11 @@ _BUILTIN_DASHBOARD_THEMES = [
     {"name": "mono",      "label": "Mono",           "description": "Clean grayscale — minimal and focused"},
     {"name": "cyberpunk", "label": "Cyberpunk",      "description": "Neon green on black — matrix terminal"},
     {"name": "rose",      "label": "Rosé",           "description": "Soft pink and warm ivory — easy on the eyes"},
+    # Matches the LiveAgents console, for a dashboard framed inside it. Two,
+    # because that console has a light mode and a frame that stayed dark inside
+    # a light page is the same mismatch the other way round.
+    {"name": "liveagents",       "label": "LiveAgents",       "description": "Matches the LiveAgents console — deep space blue, electric teal"},
+    {"name": "liveagents-light", "label": "LiveAgents Light", "description": "Matches the LiveAgents console in light mode"},
 ]
 
 

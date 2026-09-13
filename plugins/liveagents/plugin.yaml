@@ -1,0 +1,8 @@
+name: liveagents
+version: 1.0.0
+description: "LiveAgents integration — create, backtest, deploy and supervise trading agents on liveagents.org from Hermes, through the same console API and exchange API Agent Terminal itself uses. Authoring and backtests run in the caller's Agent Terminal workspace (terminal.liveagents.org), so there is one implementation of what an agent is; the agent lifecycle (list/start/stop/redeploy/logs) is the exchange's (dex.liveagents.org). Registers `hermes liveagents ...` and gates on a token: LIVEAGENTS_TERMINAL_TOKEN for the workspace, LIVEAGENTS_API_TOKEN for the exchange. URLs are settings under plugins.entries.liveagents.settings."
+author: NousResearch
+kind: backend
+requires_env:
+  - LIVEAGENTS_TERMINAL_TOKEN
+  - LIVEAGENTS_API_TOKEN

@@ -12,6 +12,7 @@ href to walk the OAuth flow.
 from __future__ import annotations
 
 import html
+import re
 from urllib.parse import quote, urlencode
 
 from hermes_cli.dashboard_auth import list_session_providers
@@ -23,8 +24,8 @@ _LOGIN_HTML_TEMPLATE = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign in — Recursive Self Learning Agents</title>
-<style>
+<title>Sign in — Parabolic Agents</title>
+{head_script}<style>
   /* Brand fonts shipped by @nous-research/ui — same files the SPA loads. */
   @font-face {{
     font-family: 'Collapse';
@@ -56,15 +57,27 @@ _LOGIN_HTML_TEMPLATE = """\
   }}
 
   :root {{
-    --background-base: #170d02;
-    --background: #170d02;
-    --midground: #ffac02;
-    --foreground: #ffffff;
-    --hairline: color-mix(in srgb, #ffac02 18%, transparent);
-    --hairline-strong: color-mix(in srgb, #ffac02 35%, transparent);
+    --background-base: {bg};
+    --background: {bg};
+    --midground: {accent};
+    --foreground: {fg};
+    --hairline: color-mix(in srgb, {accent} 18%, transparent);
+    --hairline-strong: color-mix(in srgb, {accent} 35%, transparent);
   }}
 
   *, *::before, *::after {{ box-sizing: border-box; }}
+
+  /* A sign-in that is already happening shows nothing.
+     The token arrives in the URL fragment, which a server cannot see, so this
+     page has to load for its script to spend it. Without this the visitor gets
+     a fully painted sign-in form for the half second before the redirect —
+     asked to sign in, in another product's colours, while already signed in.
+     `visibility` rather than `display`: the ground stays painted, so the frame
+     does not flash white either. Cleared by the script when the handoff fails,
+     which is the one case where the form is the right thing to show. */
+  html[data-handoff] body {{
+    visibility: hidden;
+  }}
 
   html, body {{
     margin: 0;
@@ -287,10 +300,10 @@ _LOGIN_HTML_TEMPLATE = """\
 </head>
 <body>
 <main>
-  <div class="brand">Nous<span class="dot"></span>Research</div>
+  <div class="brand">Parabolic<span class="dot"></span>Agents</div>
   <div class="card">
     <h1>Sign in</h1>
-    <p class="subtitle">Choose a sign-in method to continue to the Recursive Self Learning Agents dashboard.</p>
+    <p class="subtitle">Choose a sign-in method to continue to the Parabolic Agents dashboard.</p>
     <div class="provider-list">
 {provider_buttons}
     </div>
@@ -310,7 +323,7 @@ _EMPTY_HTML = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign-in unavailable — Recursive Self Learning Agents</title>
+<title>Sign-in unavailable — Parabolic Agents</title>
 <style>
   @font-face {
     font-family: 'Collapse';
@@ -439,6 +452,151 @@ _PASSWORD_FORM_SCRIPT = """\
 """
 
 
+# Emitted ONLY when a ``supports_sso_handoff`` provider is listed. Plain string (not
+# ``str.format``): braces are literal. The token is read from the URL fragment the sibling
+# application opened us with, or from the cookie it published on the shared parent domain, and
+# handed to ``/auth/sso-session`` — which verifies it before it becomes a session here.
+_SSO_HANDOFF_SCRIPT = """\
+<script>
+(function () {
+  var el = document.querySelector('.provider-handoff');
+  if (!el) { return; }
+  var status = el.querySelector('.handoff-status');
+  function say(text) { if (status) { status.textContent = text; status.hidden = false; } }
+  // Whatever happens from here, the page has to become visible again: the
+  // marker set in <head> hides it on the assumption the redirect is coming.
+  function reveal() { document.documentElement.removeAttribute('data-handoff'); }
+
+  // The fragment never reaches a server and never appears in a Referer, which is why the
+  // sibling application is allowed to pass a credential in it.
+  function fromFragment() {
+    var match = /(?:^|[#&])sso=([^&]+)/.exec(window.location.hash || '');
+    return match ? decodeURIComponent(match[1]) : '';
+  }
+  function fromCookie(name) {
+    if (!name) { return ''; }
+    var prefix = name + '=';
+    var parts = (document.cookie || '').split(';');
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i].trim();
+      if (part.indexOf(prefix) === 0) {
+        try { return decodeURIComponent(part.slice(prefix.length)); } catch (e) { return ''; }
+      }
+    }
+    return '';
+  }
+
+  var token = fromFragment() || fromCookie(el.getAttribute('data-cookie') || '');
+  if (!token) { reveal(); return; }
+  // Take it out of the address bar before anything else: a token left in the fragment stays in
+  // history and in anything the user copies out of the URL bar.
+  if (window.location.hash) {
+    try {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    } catch (e) { /* a browser that refuses is no reason to stop signing in */ }
+  }
+  say('Signing you in\\u2026');
+
+  fetch('/auth/sso-session', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: token, next: el.getAttribute('data-next') || '' }),
+    credentials: 'same-origin'
+  }).then(function (resp) {
+    if (resp.ok) {
+      return resp.json().then(function (data) {
+        window.location.assign((data && data.next) || '/');
+      });
+    }
+    reveal();
+    say(resp.status === 503
+      ? 'The sign-in service is unreachable. Try again shortly.'
+      : 'That sign-in has expired. Sign in again on the console.');
+  }).catch(function () {
+    reveal();
+    say('Network error. Please try again.');
+  });
+})();
+</script>
+"""
+
+
+# Emitted in <head>, before any of the page renders, ONLY when a handoff
+# provider is listed. Plain string (not ``str.format``): braces are literal.
+#
+# It runs at parse time and sets a marker the stylesheet keys off, so the
+# sign-in form never paints for somebody who is already signed in and is about
+# to be redirected. The check is deliberately the same one the handoff script
+# makes later; doing it here costs a few microseconds and saves the flash.
+_SSO_HANDOFF_HEAD = """\
+<script>
+(function () {
+  try {
+    if (/(?:^|[#&])sso=/.test(window.location.hash || '')) {
+      document.documentElement.setAttribute('data-handoff', '1');
+    }
+  } catch (e) { /* a page that cannot read its own hash simply renders */ }
+})();
+</script>
+"""
+
+
+# The sign-in page's palette, taken from the active skin.
+#
+# It used to be three hardcoded browns, which is right for the stock build and
+# wrong for any deployment that has rebranded: the one page a visitor sees
+# before they are signed in was the one page still wearing the old colours.
+# Falls back to those browns when there is no skin to ask, so an unskinned
+# install looks exactly as it did.
+_LOGIN_PALETTE_FALLBACK = {"bg": "#170d02", "accent": "#ffac02", "fg": "#ffffff"}
+
+
+def _login_palette() -> dict:
+    """``{bg, accent, fg}`` for the sign-in page, from the active skin."""
+    palette = dict(_LOGIN_PALETTE_FALLBACK)
+    try:
+        from hermes_cli.skin_engine import get_active_skin
+
+        skin = get_active_skin()
+        for key, token in (("bg", "status_bar_bg"), ("accent", "ui_accent"), ("fg", "banner_text")):
+            value = (skin.get_color(token, "") or "").strip()
+            # Only a hex colour: these land in a stylesheet, and anything else
+            # would either break the rule or be a way to inject one.
+            if re.fullmatch(r"#[0-9a-fA-F]{3,8}", value):
+                palette[key] = value
+    except Exception:  # noqa: BLE001 - a sign-in page must render without a skin
+        pass
+    return palette
+
+
+def _render_sso_handoff(provider, next_path: str) -> str:
+    """The panel for a provider whose session is minted elsewhere.
+
+    There is no local login flow to offer, so this says where sign-in happens and carries the
+    values the bootstrap script needs. Everything displayed comes from the provider's own
+    ``sso_handoff_hint`` — core knows nothing about which identity product is behind it.
+    """
+    try:
+        hint = provider.sso_handoff_hint() or {}
+    except Exception:  # noqa: BLE001 - a broken provider must still render a login page
+        hint = {}
+    label = html.escape(str(hint.get("label") or provider.display_name))
+    cookie = html.escape(str(hint.get("cookie") or ""), quote=True)
+    console = str(hint.get("console_url") or "")
+    safe_next = html.escape(next_path, quote=True) if next_path else ""
+    link = (
+        f'        <a class="provider-btn" href="{html.escape(console, quote=True)}">'
+        f'Sign in on {label}</a>\n' if console.startswith(("https://", "http://")) else "")
+    return (
+        f'      <div class="provider-handoff" data-provider="{html.escape(provider.name, quote=True)}" '
+        f'data-cookie="{cookie}" data-next="{safe_next}">\n'
+        f'        <div class="form-title">{label}</div>\n'
+        f'        <div class="handoff-status" role="status" hidden></div>\n'
+        f'{link}'
+        f'      </div>'
+    )
+
+
 def render_login_html(*, next_path: str = "") -> str:
     """Return the full HTML for ``GET /login``.
 
@@ -452,17 +610,28 @@ def render_login_html(*, next_path: str = "") -> str:
     # URL-encode then HTML-escape, matching the gate's ``_safe_next_target``
     # shape so a round-tripped value is byte-identical.
     next_qs = f"&next={html.escape(quote(next_path, safe=''), quote=True)}" if next_path else ""
-    buttons = [
-        _render_password_form(p, next_path) if getattr(p, "supports_password", False) else
-        f'      <a class="provider-btn" '
-        f'href="/auth/login?provider={html.escape(p.name, quote=True)}{next_qs}">'
-        f'Sign in with {html.escape(p.display_name)}</a>'
-        for p in providers
-    ]
-    needs_password_script = any(getattr(p, "supports_password", False) for p in providers)
+    def _render(p) -> str:
+        if getattr(p, "supports_password", False):
+            return _render_password_form(p, next_path)
+        if getattr(p, "supports_sso_handoff", False):
+            return _render_sso_handoff(p, next_path)
+        return (
+            f'      <a class="provider-btn" '
+            f'href="/auth/login?provider={html.escape(p.name, quote=True)}{next_qs}">'
+            f'Sign in with {html.escape(p.display_name)}</a>')
+
+    buttons = [_render(p) for p in providers]
+    scripts = ""
+    if any(getattr(p, "supports_password", False) for p in providers):
+        scripts += _PASSWORD_FORM_SCRIPT
+    if any(getattr(p, "supports_sso_handoff", False) for p in providers):
+        scripts += _SSO_HANDOFF_SCRIPT
+    handoff = any(getattr(p, "supports_sso_handoff", False) for p in providers)
     return _LOGIN_HTML_TEMPLATE.format(
         provider_buttons="\n".join(buttons),
-        password_script=_PASSWORD_FORM_SCRIPT if needs_password_script else "",
+        password_script=scripts,
+        head_script=_SSO_HANDOFF_HEAD if handoff else "",
+        **_login_palette(),
     )
 
 
@@ -484,7 +653,9 @@ def render_native_provider_choice_html(
                        f'Sign in with {html.escape(p.display_name)}</a>')
     if not buttons:
         return _EMPTY_HTML
-    return _LOGIN_HTML_TEMPLATE.format(provider_buttons="\n".join(buttons), password_script="")
+    return _LOGIN_HTML_TEMPLATE.format(
+        provider_buttons="\n".join(buttons), password_script="", head_script="",
+        **_login_palette())
 
 
 def _render_password_form(provider, next_path: str) -> str:

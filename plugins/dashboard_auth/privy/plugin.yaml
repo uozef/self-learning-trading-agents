@@ -1,0 +1,7 @@
+name: privy
+version: 1.0.0
+description: "Dashboard auth provider — the shared Privy session that the whole of liveagents.org signs in to. The console signs people in; this verifies the token it hands over against the keys Privy publishes, so the dashboard has no session of its own minting and cannot outlive a Privy logout. Activates when dashboard.privy.app_id is configured via config.yaml (canonical surface) or HERMES_DASHBOARD_PRIVY_APP_ID (operator override; the Cloudflare container has no config.yaml to edit). dashboard.privy.shared_cookie and dashboard.privy.console_url are optional and default to la_privy_id and https://liveagents.org."
+author: NousResearch
+kind: backend
+requires_env:
+  - HERMES_DASHBOARD_PRIVY_APP_ID

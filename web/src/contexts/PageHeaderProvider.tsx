@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useState, type ReactNode } from "react";
 import { useLocation } from "react-router";
 import { PageHeaderContext } from "./page-header-context";
+import { isChatOnlyEmbed } from "@/lib/embed";
 import { resolvePageTitle } from "@/lib/resolve-page-title";
 import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n";
@@ -48,10 +49,17 @@ export function PageHeaderProvider({
     [],
   );
 
+  /*
+   * Framed inside another console, the page header is a second title bar under
+   * that console's own. The context still provides `setTitle` / `setEnd`, so a
+   * page that fills them is not broken - the slots simply have nowhere to draw.
+   */
+  const chatOnly = isChatOnlyEmbed();
+
   return (
     <PageHeaderContext.Provider value={value}>
       <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden">
-        <header
+        {chatOnly ? null : <header
           className={cn(
             "z-1 w-full shrink-0",
             "box-border border-b border-current/20",
@@ -118,7 +126,7 @@ export function PageHeaderProvider({
               </div>
             ) : null}
           </div>
-        </header>
+        </header>}
 
         <main
           className={cn(

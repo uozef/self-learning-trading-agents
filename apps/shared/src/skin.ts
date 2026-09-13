@@ -80,7 +80,15 @@ export const SKIN_BRANDING_TOKENS = [
   'goodbye',
   'response_label',
   'prompt_symbol',
-  'help_header'
+  'help_header',
+  // Credits a skin may carry or clear. Empty means "none", which is why every
+  // reader takes them with `??` rather than `||`: a skin setting an empty
+  // string is removing the default, not failing to provide one.
+  'vendor',
+  'tagline',
+  // The version the banner shows beside the agent name, for a skin that
+  // rebrands the agent and versions it on its own cadence.
+  'banner_version'
 ] as const
 
 export type SkinBrandingToken = (typeof SKIN_BRANDING_TOKENS)[number]

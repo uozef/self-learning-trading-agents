@@ -62,6 +62,7 @@ import { Spinner } from "@nous-research/ui/ui/components/spinner";
 import { Typography } from "@nous-research/ui/ui/components/typography/index";
 import { ConfirmDialog } from "@nous-research/ui/ui/components/confirm-dialog";
 import { cn } from "@/lib/utils";
+import { isChatOnlyEmbed } from "@/lib/embed";
 import { SidebarFooter } from "@/components/SidebarFooter";
 import { SidebarStatusStrip, gatewayLine } from "@/components/SidebarStatusStrip";
 import { useBelowBreakpoint } from "@nous-research/ui/hooks/use-below-breakpoint";
@@ -123,8 +124,16 @@ function RouteFallback({ label = "Loading…" }: { label?: string }) {
   );
 }
 
+/**
+ * Where an unrouted load lands.
+ *
+ * Sessions, normally: it is the page that says what the agent has been doing.
+ * Framed for the chat, the chat - the console loads this origin's root, and a
+ * sessions list whose navigation has just been removed is a page with nothing
+ * to do next.
+ */
 function RootRedirect() {
-  return <Navigate to="/sessions" replace />;
+  return <Navigate to={isChatOnlyEmbed() ? "/chat" : "/sessions"} replace />;
 }
 
 function UnknownRouteFallback({ pluginsLoading }: { pluginsLoading: boolean }) {
@@ -132,7 +141,7 @@ function UnknownRouteFallback({ pluginsLoading }: { pluginsLoading: boolean }) {
     // Render nothing during the plugin-load window — a spinner here would just flash.
     return null;
   }
-  return <Navigate to="/sessions" replace />;
+  return <Navigate to={isChatOnlyEmbed() ? "/chat" : "/sessions"} replace />;
 }
 
 const CHAT_NAV_ITEM: NavItem = {
@@ -401,6 +410,14 @@ export default function App() {
   const normalizedPath = pathname.replace(/\/$/, "") || "/";
   const isChatRoute = normalizedPath === "/chat";
   const embeddedChat = isDashboardEmbeddedChatEnabled();
+  /*
+   * Framed inside another console's rail, this one's chrome is duplication.
+   *
+   * The sidebar, the mobile header and the page header all go, and the chat
+   * fills the window. Nothing becomes unreachable: every page keeps its URL,
+   * and the chat's own side panel keeps its toggle.
+   */
+  const chatOnly = isChatOnlyEmbed();
   // Defer mounting the persistent chat host (and its xterm chunk) until the
   // user has actually opened /chat at least once. Sticky after that so the
   // PTY survives later tab switches.
@@ -524,7 +541,7 @@ export default function App() {
         <PluginSlot name="backdrop" />
       </div>
 
-      <header
+      {chatOnly ? null : <header
         className={cn(
           "lg:hidden fixed top-0 left-0 right-0 z-40 min-h-14",
           "flex items-center gap-2 px-4 py-2",
@@ -552,9 +569,9 @@ export default function App() {
         <Typography className="font-bold text-[0.95rem] leading-[0.95] tracking-[0.05em] text-midground">
           {t.app.brand}
         </Typography>
-      </header>
+      </header>}
 
-      {mobileOpen && (
+      {mobileOpen && !chatOnly && (
         <Button
           ghost
           aria-label={t.app.closeNavigation}
@@ -570,14 +587,16 @@ export default function App() {
           fixed lg:hidden header is h-14/z-40; previously each banner carried
           its own mt-14 AND the content kept pt-14, so two visible banners
           stacked three offsets (NS-656 review P3). One spacer, applied once. */}
-      <div aria-hidden className="h-14 shrink-0 lg:hidden" />
+      {/* Clearance for the fixed mobile header. None is needed when there is no
+          header, and leaving it in put a 56px band above the chat. */}
+      {chatOnly ? null : <div aria-hidden className="h-14 shrink-0 lg:hidden" />}
       <PluginSlot name="header-banner" />
       <ProfileScopeBanner />
       <MemoryPressureBanner status={sidebarStatus} />
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <div className="flex min-h-0 min-w-0 flex-1">
-          <aside
+          {chatOnly ? null : <aside
             id="app-sidebar"
             aria-label={t.app.navigation}
             className={cn(
@@ -747,7 +766,7 @@ export default function App() {
               <AuthWidget />
               <SidebarFooter status={sidebarStatus} />
             </div>
-          </aside>
+          </aside>}
 
           <PageHeaderProvider pluginTabs={pluginTabMeta}>
             <div

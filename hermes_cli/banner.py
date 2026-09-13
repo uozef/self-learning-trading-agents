@@ -475,9 +475,22 @@ def get_latest_release_tag(repo_dir: Optional[Path] = None) -> Optional[tuple]:
     return _memo("_latest_release_cache", _compute)
 
 
+def _skin_branding(key: str, fallback: str = "") -> str:
+    """Get a branding string from the active skin, or return fallback."""
+    return _quiet(lambda: _active_skin().get_branding(key, fallback), fallback)
+
+
 def format_banner_version_label() -> str:
-    """Return the version label shown in the startup banner title."""
-    base = f"Hermes Agent v{VERSION} ({RELEASE_DATE})"
+    """Return the version label shown in the startup banner title.
+
+    The name comes from the active skin's branding rather than being hardcoded, so a skin that
+    rebrands the agent rebrands its banner too instead of drawing its own art under somebody
+    else's name. ``banner_version`` lets such a skin carry its own version line; without one the
+    label stays the build's own version and release date, which is what every Hermes skin wants.
+    """
+    name = _skin_branding("agent_name") or "Hermes Agent"
+    own_version = _skin_branding("banner_version")
+    base = f"{name} v{own_version}" if own_version else f"{name} v{VERSION} ({RELEASE_DATE})"
     state = get_git_banner_state()
     if not state:
         return base
@@ -814,7 +827,12 @@ def _banner_left_lines(model: str, cwd: str, session_id, context_length, provide
         return f" [dim {dim}]·[/] [dim {dim}]{label}[/]"
     lines = []
     ctx_str = _dim_sep(f"{_format_context_length(context_length)} context") if context_length else ""
-    nous_str = _dim_sep("Nous Research")
+    # The vendor credit beside the model, from the active skin. A skin that
+    # rebrands the agent sets its own, or an empty string to carry none - a
+    # deployment presenting itself under one name should not print a second
+    # organisation's beside every model it runs.
+    vendor = _skin_branding("vendor", "Nous Research")
+    nous_str = _dim_sep(vendor) if vendor else ""
     if not (model or "").strip():
         # Credentials resolve lazily on the first message; the banner prints first. Ask the route
         # the same question so a fresh free-tier install shows its model, not a red "unconfigured".

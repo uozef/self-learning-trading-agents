@@ -31,6 +31,7 @@ import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router";
 
 import { ChatSidebar } from "@/components/ChatSidebar";
+import { isChatOnlyEmbed } from "@/lib/embed";
 import { ChatSessionList } from "@/components/ChatSessionList";
 import { usePageHeader } from "@/contexts/usePageHeader";
 import { useI18n } from "@/i18n";
@@ -319,9 +320,14 @@ export default function ChatPage({ isActive = true }: { isActive?: boolean }) {
 
   // Collapse toggle for the desktop chat side panel (model + sessions),
   // persisted in localStorage so the choice survives reloads.
-  const [chatPanelCollapsed, setChatPanelCollapsed] = useState(
-    () => localStorage.getItem("hermes-chat-panel-collapsed") === "1",
-  );
+  const [chatPanelCollapsed, setChatPanelCollapsed] = useState(() => {
+    // Framed inside another console, the transcript is the whole reason the
+    // frame is there, so the model-and-sessions rail starts out of the way. The
+    // toggle still opens it, and the choice is not written back: it is this
+    // frame's starting point, not the account's preference.
+    if (isChatOnlyEmbed()) return true;
+    return localStorage.getItem("hermes-chat-panel-collapsed") === "1";
+  });
   const toggleChatPanel = useCallback(() => {
     setChatPanelCollapsed((prev) => {
       const next = !prev;
@@ -1928,7 +1934,10 @@ export default function ChatPage({ isActive = true }: { isActive?: boolean }) {
             </span>
           </Button>
 
-          {chatPanelCollapsed && (
+          {/* Framed for the chat, there is no panel to reopen and no room to
+              advertise one: the console's own rail is the navigation, and this
+              button sat on top of the transcript offering a second. */}
+          {chatPanelCollapsed && !isChatOnlyEmbed() && (
             <Button
               ghost
               onClick={toggleChatPanel}

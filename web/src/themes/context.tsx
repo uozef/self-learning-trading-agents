@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { embedThemeName } from "@/lib/embed";
 import { BUILTIN_THEMES, defaultTheme } from "./presets";
 import {
   FONT_CHOICES,
@@ -410,8 +411,20 @@ function applyTheme(theme: DashboardTheme) {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   /** Name of the currently active theme (built-in id or user YAML name). */
+  /*
+   * A theme the embedder asked for wins, and is never written back.
+   *
+   * Framed in another console, matching that console is the point; saving it
+   * would then change what the person sees when they open the dashboard on its
+   * own, which is not what loading a frame asked for. So it is read here, held
+   * for the page, and deliberately kept out of both localStorage and the
+   * server-side preference below.
+   */
+  const embedTheme = typeof window === "undefined" ? null : embedThemeName();
+
   const [themeName, setThemeName] = useState<string>(() => {
     if (typeof window === "undefined") return "default";
+    if (embedTheme) return embedTheme;
     const stored = window.localStorage.getItem(STORAGE_KEY) ?? "default";
     const migrated = migrateThemeName(stored);
     // Write the migrated name back so future reads converge on the new
@@ -495,7 +508,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           }
           if (Object.keys(defs).length > 0) setUserThemeDefs(defs);
         }
-        if (resp.active) {
+        // The embedder's choice is not overridden by the account's saved one:
+        // this frame was loaded to match its surroundings.
+        if (resp.active && !embedTheme) {
           const migratedActive = migrateThemeName(resp.active);
           if (migratedActive !== themeName) {
             setThemeName(migratedActive);

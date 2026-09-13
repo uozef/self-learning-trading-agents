@@ -6,6 +6,42 @@
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
 
+  /*
+   * A hostname on the platform's own domain, which is what makes the shared
+   * sign-in work at all.
+   *
+   * The console frames this dashboard, and a session cookie is `SameSite=Lax`:
+   * a browser sends those on a top-level navigation and on same-site requests,
+   * and withholds them from a cross-site iframe. On `workers.dev` this
+   * deployment is a different registrable domain from `liveagents.org`, so the
+   * framed dashboard never received the session it had just been handed, and
+   * bounced back to its own login form on every request.
+   *
+   * On `agentterminal2.liveagents.org` it is same-site with the console, so the cookie
+   * travels and nothing has to be loosened to `SameSite=None` — which would
+   * have given away the CSRF defence every other Hermes deployment relies on,
+   * to work around a hostname. It also puts the shared `la_privy_id` cookie in
+   * reach, so the dashboard can read the session itself rather than waiting to
+   * be handed one.
+   */
+  "routes": [{ "pattern": "agentterminal2.liveagents.org", "custom_domain": true }],
+
+  /*
+   * The `workers.dev` address stays on alongside it.
+   *
+   * Declaring a route turns it off by default, which took the URL the console
+   * was already pointing at out of service the moment the custom domain landed.
+   * Keeping both means a hostname change is never an outage, and leaves a way in
+   * that does not depend on the platform's DNS.
+   *
+   * The shared sign-in does not work through it, and cannot: on `workers.dev`
+   * this is a different registrable domain from the console, so a framed
+   * dashboard is cross-site and the browser withholds the session cookie. That
+   * address is for reaching the dashboard directly, where a password is the way
+   * in and the sign-in is a top-level navigation.
+   */
+  "workers_dev": true,
+
   "containers": [
     {
       // Build context is the repository root so the image can copy web/,

@@ -57,6 +57,22 @@ export interface ThemeBrand {
   goodbye: string
   tool: string
   helpHeader: string
+  /**
+   * The line under the banner wordmark. Empty carries none.
+   *
+   * A skin that rebrands the agent has to be able to drop this too: a tagline
+   * naming one organisation under another organisation's name is worse than no
+   * tagline at all.
+   */
+  tagline: string
+  /**
+   * The organisation credited beside the model. Empty carries none.
+   *
+   * Mirrors the same field on the Python banner: a deployment presenting itself
+   * under one name should not print a second organisation's beside every model
+   * it runs.
+   */
+  vendor: string
 }
 
 export interface Theme {
@@ -64,6 +80,17 @@ export interface Theme {
   brand: ThemeBrand
   bannerLogo: string
   bannerHero: string
+  /**
+   * Whether this theme came from the gateway's skin, or is the built-in default
+   * standing in until it arrives.
+   *
+   * The skin is delivered on the gateway's `ready` event, which lands after the
+   * first paint. Anything that renders the brand has to wait for it, or the
+   * boot shows the default identity for a frame and then swaps — which on a
+   * rebranded deployment reads as the wrong product flashing up before the
+   * right one.
+   */
+  skinApplied: boolean
 }
 
 // ── Color math ───────────────────────────────────────────────────────
@@ -256,7 +283,9 @@ const BRAND: ThemeBrand = {
   welcome: 'Type your message or /help for commands.',
   goodbye: 'Goodbye! ⚕',
   tool: '┊',
-  helpHeader: '(^_^)? Commands'
+  helpHeader: '(^_^)? Commands',
+  tagline: 'Nous Research · Messenger of the Digital Gods',
+  vendor: 'Nous Research'
 }
 
 const cleanPromptSymbol = (s: string | undefined, fallback: string) => {
@@ -419,14 +448,16 @@ export const DARK_THEME: Theme = {
   color: buildPalette(DARK_SEEDS, false),
   brand: BRAND,
   bannerLogo: '',
-  bannerHero: ''
+  bannerHero: '',
+  skinApplied: false
 }
 
 export const LIGHT_THEME: Theme = {
   color: buildPalette(LIGHT_SEEDS, true),
   brand: BRAND,
   bannerLogo: '',
-  bannerHero: ''
+  bannerHero: '',
+  skinApplied: false
 }
 
 // ── Background-aware readability adaptation ─────────────────────────
@@ -808,7 +839,10 @@ export const DEFAULT_THEME: Theme = normalizeThemeForAnsiLightTerminal(
 export function defaultThemeForCurrentBackground(env: NodeJS.ProcessEnv = process.env): Theme {
   const isLight = detectLightMode(env)
 
-  return normalizeThemeForAnsiLightTerminal(isLight ? LIGHT_THEME : DARK_THEME, env, isLight)
+  return {
+    ...normalizeThemeForAnsiLightTerminal(isLight ? LIGHT_THEME : DARK_THEME, env, isLight),
+    skinApplied: false
+  }
 }
 
 // ── Skin → Theme ─────────────────────────────────────────────────────
@@ -957,11 +991,16 @@ export function fromSkin(
         welcome: branding.welcome ?? d.brand.welcome,
         goodbye: branding.goodbye ?? d.brand.goodbye,
         tool: toolPrefix || d.brand.tool,
-        helpHeader: branding.help_header ?? (helpHeader || d.brand.helpHeader)
+        helpHeader: branding.help_header ?? (helpHeader || d.brand.helpHeader),
+        // `?? ` not `|| `: a skin that sets an empty tagline means "none", and
+        // must not fall back to the default it was trying to remove.
+        tagline: branding.tagline ?? d.brand.tagline,
+        vendor: branding.vendor ?? d.brand.vendor
       },
 
       bannerLogo,
-      bannerHero
+      bannerHero,
+      skinApplied: true
     },
     process.env,
     isLight

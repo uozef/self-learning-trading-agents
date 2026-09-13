@@ -212,6 +212,52 @@ export const nousBlueTheme: DashboardTheme = {
  * line-height, and ``spacious`` density so every rem-based size in the
  * dashboard scales up. For users who find the default 15px UI too dense.
  */
+/**
+ * The LiveAgents console's own palette, so a framed dashboard is not a second
+ * colour scheme inside somebody else's page.
+ *
+ * Taken from that product's tokens rather than eyeballed: `--color-void` for
+ * the ground and `--color-brand` for the accent this theme calls `midground`.
+ * Two of them, because the console has a light mode and a dashboard that stayed
+ * dark inside a light page would be the same mismatch the other way round.
+ */
+export const liveAgentsTheme: DashboardTheme = {
+  name: "liveagents",
+  label: "LiveAgents",
+  description: "Matches the LiveAgents console — deep space blue, electric teal",
+  palette: {
+    background: { hex: "#06080d", alpha: 1 },
+    midground: { hex: "#2ce8c4", alpha: 1 },
+    foreground: { hex: "#e8edf5", alpha: 0 },
+    warmGlow: "rgba(44, 232, 196, 0.22)",
+    noiseOpacity: 0.6,
+  },
+  typography: DEFAULT_TYPOGRAPHY,
+  layout: DEFAULT_LAYOUT,
+  // The console's panels are near-black; matching it keeps the terminal from
+  // reading as a hole cut in the page. The foreground is that product's own
+  // `--color-ink`, so ordinary output is the same white as the text around it.
+  terminalBackground: "#06080d",
+  terminalForeground: "#e8edf5",
+};
+
+export const liveAgentsLightTheme: DashboardTheme = {
+  name: "liveagents-light",
+  label: "LiveAgents Light",
+  description: "Matches the LiveAgents console in light mode",
+  palette: {
+    background: { hex: "#f4f6fa", alpha: 1 },
+    midground: { hex: "#0b9a83", alpha: 1 },
+    foreground: { hex: "#0f172a", alpha: 0 },
+    warmGlow: "rgba(11, 154, 131, 0.18)",
+    noiseOpacity: 0,
+  },
+  typography: DEFAULT_TYPOGRAPHY,
+  layout: DEFAULT_LAYOUT,
+  terminalBackground: "#ffffff",
+  terminalForeground: "#0f172a",
+};
+
 export const defaultLargeTheme: DashboardTheme = {
   name: "default-large",
   label: "RSLA Teal (Large)",
@@ -237,4 +283,6 @@ export const BUILTIN_THEMES: Record<string, DashboardTheme> = {
   mono: monoTheme,
   cyberpunk: cyberpunkTheme,
   rose: roseTheme,
+  [liveAgentsTheme.name]: liveAgentsTheme,
+  [liveAgentsLightTheme.name]: liveAgentsLightTheme,
 };

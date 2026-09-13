@@ -217,6 +217,42 @@ def clear_sso_attempt_cookie(response: Response, *, prefix: str = "") -> None:
         bare_attrs=_common_attrs(use_https=False, prefix=prefix))
 
 
+def parent_cookie_domain(host: str) -> Optional[str]:
+    """The parent domain a sibling application would have scoped a shared cookie to, or None.
+
+    A shared sign-in is published on the registrable parent (``hermes.example.org`` ->
+    ``.example.org``) because that is the only scope both applications can read. Derived by
+    dropping the leftmost label, which is right for the shape this exists for and harmless when
+    it is not: a cookie scoped to a domain the host does not belong to, or to a public suffix, is
+    refused by the browser rather than accepted for somebody else. Returns None for a bare host,
+    an IP literal or localhost, where there is no parent worth sharing.
+    """
+    bare = (host or "").split(":", 1)[0].strip().lower().rstrip(".")
+    if not bare or bare == "localhost" or all(part.isdigit() for part in bare.split(".")):
+        return None
+    labels = bare.split(".")
+    return f".{'.'.join(labels[1:])}" if len(labels) > 2 else None
+
+
+def clear_shared_cookies(
+    response: Response, names, *, host: str, use_https: bool, prefix: str = "") -> None:
+    """Delete cookies this origin did not set (a sibling application's shared session).
+
+    Each name is expired twice: host-only, and on the parent domain, because a cookie is
+    identified by name, domain and path together — the domain-scoped copy is a *different* cookie
+    that a host-only deletion cannot touch, and it is the one holding the shared session. Names
+    come from the provider (``sso_cookies_to_clear``); nothing here knows what any of them mean.
+    """
+    domain = parent_cookie_domain(host)
+    path = _cookie_path(prefix)
+    for name in names:
+        response.set_cookie(
+            name, "", max_age=0, path=path, samesite="lax", secure=use_https)
+        if domain:
+            response.set_cookie(
+                name, "", max_age=0, path=path, domain=domain, samesite="lax", secure=use_https)
+
+
 def detect_https(request: Request) -> bool:
     """``Secure`` flag decision (honours ``X-Forwarded-Proto`` under uvicorn ``proxy_headers``)."""
     return request.url.scheme == "https"

@@ -2092,6 +2092,16 @@ def _session_info(agent, session: dict | None = None) -> dict:
     with contextlib.suppress(Exception):
         from hermes_cli import __version__, __release_date__
         info.update(version=__version__, release_date=__release_date__)
+    # A skin that rebrands the agent may version it on its own cadence: the
+    # build's version and release date describe the engine, not the product
+    # somebody is looking at. `banner_version` replaces both, because a date
+    # from this checkout beside a product's own version number is two claims
+    # about different things sitting next to each other.
+    with contextlib.suppress(Exception):
+        from hermes_cli.skin_engine import get_active_skin
+        own = (get_active_skin().get_branding("banner_version", "") or "").strip()
+        if own:
+            info.update(version=own, release_date="")
     live_agent = agent is not None and not sess.get("_compute_host_active")
     if live_agent:
         with contextlib.suppress(Exception):
