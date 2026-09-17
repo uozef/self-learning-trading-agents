@@ -52,13 +52,19 @@ class NoSuchAgent(ExchangeError):
 class ExchangeClient:
     """The exchange's agent API, as one holder of one token."""
 
-    def __init__(self, base_url: str, token: str, *, client: Optional[httpx.Client] = None) -> None:
+    def __init__(
+        self, base_url: str, token: str, *,
+        client: Optional[httpx.Client] = None, platform_url: str = "",
+    ) -> None:
         self._base = base_url.rstrip("/")
         self._token = token
         self._client = client
+        # The console's own Worker. Only the funding request goes there, and it
+        # goes with this same credential - see request_funding.
+        self._platform = (platform_url or "").rstrip("/")
 
-    def _request(self, method: str, path: str, *, json_body: Any = None) -> Dict[str, Any]:
-        url = f"{self._base}{path}"
+    def _request(self, method: str, path: str, *, json_body: Any = None, base: str = "") -> Dict[str, Any]:
+        url = f"{base or self._base}{path}"
         headers = {"accept": "application/json", "authorization": f"Bearer {self._token}"}
         if json_body is not None:
             headers["content-type"] = "application/json"
@@ -112,6 +118,46 @@ class ExchangeClient:
         return self._request("GET", f"/api/agents/{_seg(agent_id)}/source")
 
     # ---- writing ----------------------------------------------------------
+
+    def request_funding(
+        self, agent_id: str, *, amount: str = "", note: str = "",
+    ) -> Dict[str, Any]:
+        """Ask the owner to fund an agent, and move nothing.
+
+        A deployed agent starts with an empty sub-account, so the first thing a new one does is
+        place orders the exchange refuses for want of a balance. Funding it is a transfer between
+        two accounts one person owns, and the console has the dialog for it: what the agent holds,
+        what the owner has free, an amount, a button.
+
+        This records the request that opens that dialog. It is not the transfer and cannot become
+        one: the row carries a name, a sub-account number and a suggested amount, the console
+        prefills a field with it, and the money moves in the owner's browser under their own
+        session after they have read both figures.
+
+        That is the point of doing it this way rather than posting the transfer. This process
+        holds an exchange session and could move the money unaided - which would mean an agent's
+        code, a dependency of it or a line in a prompt could spend somebody's capital while they
+        were not there. Asking cannot be done quietly.
+
+        ``amount`` is optional and stays optional: the person at the console can see their own
+        free balance and this cannot, so a figure invented here would be a guess at the one thing
+        the dialog answers better.
+        """
+        if not self._platform:
+            raise ExchangeError("no platform URL is configured, so funding cannot be requested")
+        body: Dict[str, Any] = {"agentId": str(agent_id), "source": "hermes"}
+        if amount:
+            body["amount"] = str(amount)
+        if note:
+            body["note"] = note
+        return self._request("POST", "/agents/fund-requests", json_body=body, base=self._platform)
+
+    def fund_requests(self) -> List[Dict[str, Any]]:
+        """Funding requests of the caller's own that are still waiting to be answered."""
+        if not self._platform:
+            return []
+        answer = self._request("GET", "/agents/fund-requests", base=self._platform)
+        return list(answer.get("requests") or [])
 
     def deploy(
         self, *, name: str, market: str, source: str, mode: str,

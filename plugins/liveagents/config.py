@@ -6,6 +6,9 @@ Two hosts, two jobs, and the split is the same one Agent Terminal makes:
   the trading harness live there, so authoring and backtesting happen there and nowhere else. A
   builder here that wrote its own templates would be a second idea of what an agent is, and the
   two would disagree the first time either changed.
+* **The platform Worker** (``code.liveagents.org``) serves the console and, for now, the one
+  route that belongs on the exchange and cannot be deployed there: the funding request an agent
+  raises. It takes the exchange credential, so there is nothing extra to configure.
 * **The exchange** (``dex.liveagents.org``) owns deployed agents: the sub-accounts, the scoped
   tokens, the containers and the lifecycle. It is the authority on what is running, so
   list/start/stop/redeploy/logs ask it rather than asking a terminal.
@@ -48,6 +51,12 @@ from typing import Callable, Optional
 DEFAULT_TERMINAL_URL = "https://terminal.liveagents.org"
 DEFAULT_EXCHANGE_URL = "https://dex.liveagents.org"
 DEFAULT_CONSOLE_URL = "https://liveagents.org"
+# The Worker that serves the console and its API. One route here matters to this
+# plugin: the funding request an agent raises, which belongs beside the rest of
+# `/api/agents` on the exchange and is served here instead because the
+# exchange's container image cannot currently be built. It takes the exchange
+# credential, not a console one, so nothing new has to be configured for it.
+DEFAULT_PLATFORM_URL = "https://code.liveagents.org/api"
 
 TERMINAL_TOKEN_ENV = "LIVEAGENTS_TERMINAL_TOKEN"
 EXCHANGE_TOKEN_ENV = "LIVEAGENTS_API_TOKEN"
@@ -64,6 +73,7 @@ class LiveAgentsConfig:
     terminal_url: str = DEFAULT_TERMINAL_URL
     exchange_url: str = DEFAULT_EXCHANGE_URL
     console_url: str = DEFAULT_CONSOLE_URL
+    platform_url: str = DEFAULT_PLATFORM_URL
     terminal_token: str = ""
     exchange_token: str = ""
 
@@ -117,6 +127,7 @@ def load_config(
         terminal_url=setting("terminal_url", DEFAULT_TERMINAL_URL),
         exchange_url=setting("exchange_url", DEFAULT_EXCHANGE_URL),
         console_url=setting("console_url", DEFAULT_CONSOLE_URL),
+        platform_url=setting("platform_url", DEFAULT_PLATFORM_URL),
         terminal_token=(environ.get(TERMINAL_TOKEN_ENV) or "").strip(),
         exchange_token=(environ.get(EXCHANGE_TOKEN_ENV) or "").strip(),
     )

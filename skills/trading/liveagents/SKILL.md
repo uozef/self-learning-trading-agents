@@ -11,6 +11,7 @@ metadata:
     related_skills:
       - create-new-trading-agent
       - deploy-agent-live
+      - fund-agent
       - monitor-agent
       - backtest-agent
 ---

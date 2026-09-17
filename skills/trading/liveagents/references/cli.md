@@ -45,6 +45,7 @@ mid-deploy.
 | `start <name>` | starts a stopped agent from the code it was deployed with |
 | `stop <name>` | stops it; the sub-account and its funds are untouched |
 | `redeploy <name> <file> [--params …] [--market …] [--mode …]` | swaps the code, keeps the sub-account |
+| `fund-agent [<name>] [--amount N] [--note "why"] [--no-wait]` | asks the owner to fund an agent, then waits for the money |
 
 `<name>` matches an agent's name or its id, and an unknown one lists what does exist rather than
 failing blankly.
@@ -52,6 +53,19 @@ failing blankly.
 `redeploy` picks up a sibling `<file>.params.json` automatically, the same convention the
 workspace uses. Keeping the sub-account is the point: a new agent for new code would strand the
 balance in the abandoned one.
+
+`fund-agent` is the one subcommand that is not answered by the exchange or the workspace. It
+records a request on the platform Worker that serves the console, which opens its own funding
+dialog - what the agent holds, what the owner has free, an amount, a button - and **the transfer
+happens there**, in their browser, under their session. The credential is the same exchange
+session everything else here uses, so there is nothing extra to configure.
+
+It moves no money and cannot be made to. `LIVEAGENTS_API_TOKEN` would allow a transfer outright,
+and that is exactly why funding is a request: otherwise an agent's code, a dependency of it or a
+line in a prompt could spend somebody's capital while they were not there. The command then
+watches the sub-account and reports the equity changing, so "asked" and "funded" are never
+reported as the same thing. Nothing arriving is not a failure and not something to retry - a
+second request replaces the first, which only moves the figure the owner was looking at.
 
 ## Exit codes
 

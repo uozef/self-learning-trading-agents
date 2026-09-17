@@ -16,6 +16,7 @@ Subcommands map onto whichever host owns the question:
     agents      exchange    what is deployed, with status and metrics
     logs        exchange    an agent's stored error and its container's output
     start/stop  exchange    lifecycle
+    fund-agent  platform    ask the owner to fund an agent; the console moves the money
     redeploy    exchange    swap the code, keep the sub-account
     source      exchange    the code an agent is actually running
 
@@ -111,6 +112,20 @@ def register_cli(parser: argparse.ArgumentParser) -> None:
     p_start = subs.add_parser("start", help="Start a stopped agent")
     p_start.add_argument("name", help="Agent name or id")
 
+    p_fund = subs.add_parser(
+        "fund-agent", help="Ask the owner to fund an agent (the console does the transfer)")
+    p_fund.add_argument(
+        "name", nargs="?", default="",
+        help="Agent name or id. Defaults to the one deployed most recently")
+    p_fund.add_argument(
+        "--amount", default="",
+        help="A suggestion that prefills the console dialog. Leave it out and the owner decides")
+    p_fund.add_argument("--note", default="", help="One line saying why, shown in the dialog")
+    p_fund.add_argument(
+        "--no-wait", dest="wait", action="store_false",
+        help="Record the request and return, instead of watching for the transfer")
+    p_fund.set_defaults(wait=True)
+
     p_stop = subs.add_parser("stop", help="Stop a running agent (its sub-account is untouched)")
     p_stop.add_argument("name", help="Agent name or id")
 
@@ -154,7 +169,8 @@ def _config(args: argparse.Namespace) -> LiveAgentsConfig:
         # One token on the command line serves whichever host this subcommand talks to.
         return LiveAgentsConfig(
             terminal_url=cfg.terminal_url, exchange_url=cfg.exchange_url,
-            console_url=cfg.console_url, terminal_token=override, exchange_token=override)
+            console_url=cfg.console_url, platform_url=cfg.platform_url,
+            terminal_token=override, exchange_token=override)
     return cfg
 
 
@@ -176,7 +192,8 @@ def _terminal(args: argparse.Namespace) -> TerminalClient:
 
 def _exchange(args: argparse.Namespace) -> ExchangeClient:
     cfg = _config(args)
-    return ExchangeClient(cfg.exchange_url, cfg.require_exchange_token())
+    return ExchangeClient(
+        cfg.exchange_url, cfg.require_exchange_token(), platform_url=cfg.platform_url)
 
 
 def _emit(args: argparse.Namespace, payload: Any, text: str) -> int:
@@ -522,6 +539,100 @@ def _cmd_stop(args: argparse.Namespace) -> int:
     return _emit(args, result, text)
 
 
+# How long to watch for the money, and how often to look.
+_FUND_WAIT_SECONDS = 150
+_FUND_POLL_SECONDS = 5
+
+
+def _cmd_fund_agent(args: argparse.Namespace) -> int:
+    """Ask for an agent to be funded, then say whether the money arrived.
+
+    Two facts, and only the second is what anybody wanted: that the request was recorded, and that
+    the sub-account now holds something. The equity comes from the exchange, so what is reported
+    is the transfer having landed rather than this command's opinion of how it went.
+    """
+    client = _exchange(args)
+    agents = client.agents()
+    if not agents:
+        print("Nothing is deployed, so there is nothing to fund.", file=sys.stderr)
+        return 2
+
+    if args.name:
+        agent = client.find(args.name)
+    else:
+        # "Fund the agent I just deployed", which is the moment this is for.
+        agent = sorted(agents, key=lambda a: str(a.get("createdAt") or ""), reverse=True)[0]
+
+    if args.amount:
+        try:
+            if float(args.amount) <= 0:
+                raise ValueError
+        except ValueError:
+            print(f"--amount {args.amount} is not a positive number.", file=sys.stderr)
+            return 2
+
+    before = _as_float(agent.get("equity"))
+    answer = client.request_funding(str(agent.get("id")), amount=args.amount, note=args.note)
+    request = answer.get("request") or {}
+
+    lines = [
+        f"Asked the owner's console to fund {agent.get('name')}.",
+        f"  sub-account  #{agent.get('accountId')}",
+        f"  market       {agent.get('market')}",
+        f"  holds        {_money(agent.get('equity'))}",
+    ]
+    if args.amount:
+        lines.append(f"  suggested    {args.amount} {request.get('asset') or 'USDT'}")
+    lines.append("")
+    lines.append(
+        "The funding dialog is opening in their console: it shows what this agent holds and what\n"
+        "they have free, and the amount is theirs to type. Nothing moves until they press Deposit\n"
+        "there - this process cannot and does not move it. With no console tab open the request\n"
+        "waits, and lapses fifteen minutes after it was raised.")
+
+    if not args.wait:
+        return _emit(args, answer, "\n".join(lines))
+
+    print("\n".join(lines))
+    deadline = time.time() + _FUND_WAIT_SECONDS
+    waiting = False
+    while time.time() < deadline:
+        time.sleep(_FUND_POLL_SECONDS)
+        try:
+            fresh = next(
+                (a for a in client.agents() if str(a.get("id")) == str(agent.get("id"))), None)
+        except ExchangeError:
+            continue  # A blip while waiting is not an answer either way.
+        now = _as_float((fresh or {}).get("equity"))
+        if now > before:
+            text = (
+                f"{agent.get('name')} now holds {_money((fresh or {}).get('equity'))}, up from "
+                f"{_money(before)}.\nIt can open a position on its next tick.")
+            if waiting:
+                print("")
+            return _emit(args, {"agent": fresh, "request": request, "funded": True}, text)
+        if not waiting:
+            sys.stdout.write("Waiting for the transfer")
+            waiting = True
+        sys.stdout.write(".")
+        sys.stdout.flush()
+
+    if waiting:
+        print("")
+    return _emit(
+        args,
+        {"agent": agent, "request": request, "funded": False},
+        "Nothing has arrived yet, which is not a failure - the dialog is waiting for them.\n"
+        "Do not raise a second request; this one is still live.")
+
+
+def _as_float(value: Any) -> float:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def _cmd_redeploy(args: argparse.Namespace) -> int:
     try:
         source = _read_text(args.file)
@@ -577,5 +688,6 @@ _COMMANDS = {
     "source": _cmd_source,
     "start": _cmd_start,
     "stop": _cmd_stop,
+    "fund-agent": _cmd_fund_agent,
     "redeploy": _cmd_redeploy,
 }

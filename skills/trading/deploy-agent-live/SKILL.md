@@ -8,7 +8,7 @@ platforms: [linux, macos, windows]
 metadata:
   hermes:
     tags: [Trading, LiveAgents, Deployment, Live, Agents]
-    related_skills: [liveagents, deploy-agent-demo, monitor-agent, diagnose-agent, stop-agent]
+    related_skills: [liveagents, deploy-agent-demo, fund-agent, monitor-agent, diagnose-agent, stop-agent]
 ---
 
 # Deploy Agent Live Skill

@@ -25,6 +25,7 @@ from plugins.liveagents.terminal import TerminalClient, TerminalError
 
 TERMINAL = "https://terminal.example.test"
 EXCHANGE = "https://dex.example.test"
+PLATFORM = "https://platform.example.test/api"
 
 
 def _seen(store):
@@ -49,10 +50,11 @@ def _terminal_client(reply) -> tuple[TerminalClient, Recorder]:
     return TerminalClient(TERMINAL, "tok-terminal", client=client), recorder
 
 
-def _exchange_client(reply) -> tuple[ExchangeClient, Recorder]:
+def _exchange_client(reply, *, platform: str = PLATFORM) -> tuple[ExchangeClient, Recorder]:
     recorder = Recorder(reply)
     client = httpx.Client(transport=_seen(recorder))
-    return ExchangeClient(EXCHANGE, "tok-exchange", client=client), recorder
+    return ExchangeClient(
+        EXCHANGE, "tok-exchange", client=client, platform_url=platform), recorder
 
 
 # ---------------------------------------------------------------------------
@@ -272,6 +274,30 @@ class TestExchangeClient:
         assert [str(r.url.path) for r in seen] == [
             "/api/agents/ag_1/stop", "/api/agents/ag_1/start"]
 
+    def test_funding_is_a_request_to_the_platform_and_not_a_transfer(self):
+        # The one thing worth proving about this call: where it goes, what it carries, and that
+        # it is not the exchange's transfer route. A funding request moves nothing.
+        client, seen = _exchange_client(
+            lambda r: httpx.Response(201, json={"request": {"id": "fr_1", "status": "pending"}}))
+        answer = client.request_funding("ag_1", amount="250", note="out of margin")
+        assert answer["request"]["status"] == "pending"
+        assert str(seen[0].url) == f"{PLATFORM}/agents/fund-requests"
+        assert seen[0].headers["authorization"] == "Bearer tok-exchange"
+        body = json.loads(seen[0].content)
+        assert body == {
+            "agentId": "ag_1", "source": "hermes", "amount": "250", "note": "out of margin"}
+
+    def test_funding_without_an_amount_leaves_the_figure_to_the_owner(self):
+        client, seen = _exchange_client(lambda r: httpx.Response(201, json={"request": {}}))
+        client.request_funding("ag_1")
+        assert json.loads(seen[0].content) == {"agentId": "ag_1", "source": "hermes"}
+
+    def test_funding_says_so_when_there_is_nowhere_to_send_it(self):
+        client, seen = _exchange_client(lambda r: httpx.Response(201, json={}), platform="")
+        with pytest.raises(ExchangeError):
+            client.request_funding("ag_1")
+        assert not seen, "nothing should have been sent"
+
     def test_the_exchanges_own_message_is_what_the_caller_is_told(self):
         client, _ = _exchange_client(
             lambda r: httpx.Response(402, json={"error": "no free collateral"}))
@@ -297,6 +323,7 @@ class TestCliSurface:
         expected = {
             "whoami", "launch", "kinds", "build", "publish", "backtest", "backtests",
             "backtest-read", "agents", "logs", "source", "start", "stop", "redeploy",
+            "fund-agent",
         }
         assert expected <= set(la_cli._COMMANDS)
 
@@ -318,6 +345,22 @@ class TestCliSurface:
     def test_a_mode_that_is_neither_is_refused(self):
         with pytest.raises(SystemExit):
             _parse(["publish", "a", "--market", "m", "--mode", "yolo"])
+
+    def test_funding_takes_an_optional_agent_and_an_optional_amount(self):
+        # Both optional on purpose: the newest agent is what "fund what I just deployed" means,
+        # and the amount belongs to whoever can see their own free balance.
+        bare = _parse(["fund-agent"])
+        assert bare.name == "" and bare.amount == "" and bare.wait is True
+        named = _parse(["fund-agent", "momentum", "--amount", "250", "--no-wait"])
+        assert named.name == "momentum" and named.amount == "250" and named.wait is False
+
+    def test_funding_refuses_an_amount_that_is_not_a_positive_number(self, monkeypatch, capsys):
+        monkeypatch.setenv(la_config.EXCHANGE_TOKEN_ENV, "tok")
+        monkeypatch.setattr(
+            la_cli.ExchangeClient, "agents", lambda self: [_agent()], raising=True)
+        code = la_cli.dispatch(_parse(["fund-agent", "momentum", "--amount", "-5"]))
+        assert code == 2
+        assert "positive" in capsys.readouterr().err
 
     def test_an_unknown_subcommand_is_an_exit_code_not_a_traceback(self):
         args = argparse.Namespace(liveagents_command="teleport", json=False, token=None)
