@@ -24,7 +24,7 @@ _LOGIN_HTML_TEMPLATE = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign in — Parabolic Agents</title>
+<title>Sign in — {brand}</title>
 {head_script}<style>
   /* Brand fonts shipped by @nous-research/ui — same files the SPA loads. */
   @font-face {{
@@ -60,6 +60,7 @@ _LOGIN_HTML_TEMPLATE = """\
     --background-base: {bg};
     --background: {bg};
     --midground: {accent};
+    --on-midground: {on_accent};
     --foreground: {fg};
     --hairline: color-mix(in srgb, {accent} 18%, transparent);
     --hairline-strong: color-mix(in srgb, {accent} 35%, transparent);
@@ -143,6 +144,10 @@ _LOGIN_HTML_TEMPLATE = """\
     text-transform: uppercase;
     color: var(--midground);
   }}
+  /* Each half stays whole; a narrow screen breaks the name at the dot. */
+  .brand .part {{
+    white-space: nowrap;
+  }}
   .brand .dot {{
     display: inline-block;
     width: 6px;
@@ -196,7 +201,7 @@ _LOGIN_HTML_TEMPLATE = """\
     padding: 0.95rem 1rem;
     text-align: center;
     background: var(--midground);
-    color: var(--background-base);
+    color: var(--on-midground);
     font-family: 'Collapse', sans-serif;
     font-weight: 700;
     font-size: 0.78rem;
@@ -294,16 +299,16 @@ _LOGIN_HTML_TEMPLATE = """\
   /* Selection — DS uses midground bg + background text. */
   ::selection {{
     background: var(--midground);
-    color: var(--background-base);
+    color: var(--on-midground);
   }}
 </style>
 </head>
 <body>
 <main>
-  <div class="brand">Parabolic<span class="dot"></span>Agents</div>
+  <div class="brand">{wordmark}</div>
   <div class="card">
     <h1>Sign in</h1>
-    <p class="subtitle">Choose a sign-in method to continue to the Parabolic Agents dashboard.</p>
+    <p class="subtitle">Choose a sign-in method to continue to {brand}.</p>
     <div class="provider-list">
 {provider_buttons}
     </div>
@@ -323,7 +328,7 @@ _EMPTY_HTML = """\
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sign-in unavailable — Parabolic Agents</title>
+<title>Sign-in unavailable — __BRAND__</title>
 <style>
   @font-face {
     font-family: 'Collapse';
@@ -340,10 +345,10 @@ _EMPTY_HTML = """\
     src: url('/fonts/RulesCompressed-Medium.woff2') format('woff2');
   }
   :root {
-    --background-base: #170d02;
-    --midground: #ffac02;
-    --foreground: #ffffff;
-    --hairline: color-mix(in srgb, #ffac02 18%, transparent);
+    --background-base: __BG__;
+    --midground: __ACCENT__;
+    --foreground: __FG__;
+    --hairline: color-mix(in srgb, __ACCENT__ 18%, transparent);
   }
   *, *::before, *::after { box-sizing: border-box; }
   html, body {
@@ -551,13 +556,102 @@ _SSO_HANDOFF_HEAD = """\
 _LOGIN_PALETTE_FALLBACK = {"bg": "#170d02", "accent": "#ffac02", "fg": "#ffffff"}
 
 
+def _skin():
+    """The skin this deployment chose in its config, not merely the process default.
+
+    The CLI selects its skin from ``display.skin`` at startup; the dashboard server
+    never does, so asking ``get_active_skin()`` here returned the module default and
+    the sign-in page wore that (or, with no skin at all, the stock browns) while the
+    terminal behind it wore the configured one.
+    """
+    from hermes_cli.skin_engine import get_active_skin, load_skin
+
+    try:
+        from hermes_cli.config import read_raw_config_readonly
+
+        display = read_raw_config_readonly().get("display") or {}
+        name = display.get("skin") if isinstance(display, dict) else None
+        if isinstance(name, str) and name.strip():
+            return load_skin(name.strip())
+    except Exception:  # noqa: BLE001 - fall back to whatever is active
+        pass
+    return get_active_skin()
+
+
+def configured_brand() -> str | None:
+    """The configured skin's product name, or None when the config names no skin.
+
+    For the dashboard shell: a deployment that chose a skin is called what that skin
+    calls it; one that chose none keeps the name built into the dashboard.
+    """
+    try:
+        from hermes_cli.config import read_raw_config_readonly
+        from hermes_cli.skin_engine import load_skin
+
+        display = read_raw_config_readonly().get("display") or {}
+        name = display.get("skin") if isinstance(display, dict) else None
+        if not (isinstance(name, str) and name.strip()):
+            return None
+        brand = (load_skin(name.strip()).get_branding("agent_name", "") or "").strip()
+        return brand or None
+    except Exception:  # noqa: BLE001 - the shell must render without one
+        return None
+
+
+def _on(accent: str) -> str:
+    """Text that reads on the accent: dark on a light one (the stock amber), white on a dark one."""
+    h = accent.lstrip("#")
+    if len(h) in (3, 4):
+        h = "".join(c * 2 for c in h[:3])
+    try:
+        r, g, b = (int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    except ValueError:
+        return "#000000"
+    lin = lambda c: c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4  # noqa: E731
+    lum = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
+    return "#000000" if lum > 0.36 else "#ffffff"
+
+
+# What the page calls the product. From the skin's own name, so a rebranded
+# deployment ("LiveAgents - Hermes Terminal") is not signed into under the stock
+# one; the stock name when there is no skin to ask.
+_BRAND_FALLBACK = "Parabolic Agents"
+
+
+def _brand() -> str:
+    try:
+        name = (_skin().get_branding("agent_name", "") or "").strip()
+        return name or _BRAND_FALLBACK
+    except Exception:  # noqa: BLE001 - a sign-in page must render without a skin
+        return _BRAND_FALLBACK
+
+
+def _wordmark(name: str) -> str:
+    """The name above the card, its two halves either side of the brand dot."""
+    parts = [p.strip() for p in re.split(r"\s+[-–—]\s+", name, maxsplit=1) if p.strip()]
+    if len(parts) < 2:
+        parts = name.split(" ", 1) if " " in name else [name]
+    return '<span class="dot"></span>'.join(f'<span class="part">{html.escape(p)}</span>' for p in parts)
+
+
+def _page_values() -> dict:
+    """Everything the templates fill in besides their content: palette and name."""
+    palette = _login_palette()
+    name = _brand()
+    return {**palette, "on_accent": _on(palette["accent"]), "brand": html.escape(name), "wordmark": _wordmark(name)}
+
+
+def _empty_html() -> str:
+    v = _page_values()
+    return (_EMPTY_HTML.replace("__BRAND__", v["brand"]).replace("__BG__", v["bg"])
+            .replace("__ACCENT__", v["accent"]).replace("__FG__", v["fg"]))
+
+
 def _login_palette() -> dict:
     """``{bg, accent, fg}`` for the sign-in page, from the active skin."""
     palette = dict(_LOGIN_PALETTE_FALLBACK)
     try:
-        from hermes_cli.skin_engine import get_active_skin
-
-        skin = get_active_skin()
+        skin = _skin()
         for key, token in (("bg", "status_bar_bg"), ("accent", "ui_accent"), ("fg", "banner_text")):
             value = (skin.get_color(token, "") or "").strip()
             # Only a hex colour: these land in a stylesheet, and anything else
@@ -606,7 +700,7 @@ def render_login_html(*, next_path: str = "") -> str:
     """
     providers = list_session_providers()
     if not providers:
-        return _EMPTY_HTML
+        return _empty_html()
     # URL-encode then HTML-escape, matching the gate's ``_safe_next_target``
     # shape so a round-tripped value is byte-identical.
     next_qs = f"&next={html.escape(quote(next_path, safe=''), quote=True)}" if next_path else ""
@@ -631,7 +725,7 @@ def render_login_html(*, next_path: str = "") -> str:
         provider_buttons="\n".join(buttons),
         password_script=scripts,
         head_script=_SSO_HANDOFF_HEAD if handoff else "",
-        **_login_palette(),
+        **_page_values(),
     )
 
 
@@ -652,10 +746,10 @@ def render_native_provider_choice_html(
         buttons.append(f'      <a class="provider-btn" href="{href}">'
                        f'Sign in with {html.escape(p.display_name)}</a>')
     if not buttons:
-        return _EMPTY_HTML
+        return _empty_html()
     return _LOGIN_HTML_TEMPLATE.format(
         provider_buttons="\n".join(buttons), password_script="", head_script="",
-        **_login_palette())
+        **_page_values())
 
 
 def _render_password_form(provider, next_path: str) -> str:

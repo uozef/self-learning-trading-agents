@@ -109,6 +109,10 @@ import { latchChatActivation } from "@/lib/chat-activation";
 import { api } from "@/lib/api";
 import type { StatusResponse, UpdateCheckResponse } from "@/lib/api";
 
+/** The product's name: the configured skin's, injected by the server, else the built-in one. */
+const brandName = (builtIn: string) =>
+  (typeof window !== "undefined" && (window as { __HERMES_BRAND__?: string }).__HERMES_BRAND__) || builtIn;
+
 function RouteFallback({ label = "Loading…" }: { label?: string }) {
   return (
     <div
@@ -567,7 +571,7 @@ export default function App() {
         </Button>
 
         <Typography className="font-bold text-[0.95rem] leading-[0.95] tracking-[0.05em] text-midground">
-          {t.app.brand}
+          {brandName(t.app.brand)}
         </Typography>
       </header>}
 
@@ -631,7 +635,7 @@ export default function App() {
                 <PluginSlot name="header-left" />
 
                 <Typography className="font-bold text-[1.125rem] leading-[0.95] tracking-[0.0525rem] text-midground uppercase">
-                  {t.app.brand}
+                  {brandName(t.app.brand)}
                 </Typography>
               </div>
 

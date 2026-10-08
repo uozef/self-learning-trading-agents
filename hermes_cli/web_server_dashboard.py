@@ -3,8 +3,10 @@
 
 import logging
 import importlib.util
+import html as _html
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -165,6 +167,19 @@ def mount_spa(application: FastAPI):
             for attr in ('href="/assets/', 'src="/assets/', 'href="/favicon.ico"', 'href="/fonts/',
                          'href="/ds-assets/', 'src="/ds-assets/'):
                 html = html.replace(attr, attr.replace('"/', f'"{prefix}/', 1))
+        # The product's name, from the configured skin: the tab title and the
+        # wordmark the SPA draws (``window.__HERMES_BRAND__``). Nothing changes
+        # for a deployment whose config names no skin.
+        try:
+            from hermes_cli.dashboard_auth.login_page import configured_brand
+
+            brand = configured_brand()
+        except Exception:  # noqa: BLE001
+            brand = None
+        if brand:
+            html = re.sub(r"<title>[^<]*</title>", lambda _m: f"<title>{_html.escape(brand)}</title>", html, count=1)
+            bootstrap_script = bootstrap_script.replace(
+                "</script>", f"window.__HERMES_BRAND__={json.dumps(brand)};</script>", 1)
         theme_bootstrap = _render_active_theme_bootstrap_css()
         if theme_bootstrap:
             html = html.replace("</head>", f"{theme_bootstrap}</head>", 1)

@@ -224,21 +224,21 @@ export const nousBlueTheme: DashboardTheme = {
 export const liveAgentsTheme: DashboardTheme = {
   name: "liveagents",
   label: "LiveAgents",
-  description: "Matches the LiveAgents console — deep space blue, electric teal",
+  description: "Matches the LiveAgents console: black, with its blue",
   palette: {
-    background: { hex: "#06080d", alpha: 1 },
-    midground: { hex: "#2ce8c4", alpha: 1 },
-    foreground: { hex: "#e8edf5", alpha: 0 },
-    warmGlow: "rgba(44, 232, 196, 0.22)",
-    noiseOpacity: 0.6,
+    background: { hex: "#000000", alpha: 1 },
+    midground: { hex: "#3b82f6", alpha: 1 },
+    foreground: { hex: "#fafafa", alpha: 0 },
+    warmGlow: "rgba(59, 130, 246, 0.2)",
+    noiseOpacity: 0,
   },
   typography: DEFAULT_TYPOGRAPHY,
   layout: DEFAULT_LAYOUT,
-  // The console's panels are near-black; matching it keeps the terminal from
+  // The console's ground is black; matching it keeps the terminal from
   // reading as a hole cut in the page. The foreground is that product's own
   // `--color-ink`, so ordinary output is the same white as the text around it.
-  terminalBackground: "#06080d",
-  terminalForeground: "#e8edf5",
+  terminalBackground: "#000000",
+  terminalForeground: "#fafafa",
 };
 
 export const liveAgentsLightTheme: DashboardTheme = {
@@ -246,10 +246,10 @@ export const liveAgentsLightTheme: DashboardTheme = {
   label: "LiveAgents Light",
   description: "Matches the LiveAgents console in light mode",
   palette: {
-    background: { hex: "#f4f6fa", alpha: 1 },
-    midground: { hex: "#0b9a83", alpha: 1 },
+    background: { hex: "#eceff4", alpha: 1 },
+    midground: { hex: "#1d4ed8", alpha: 1 },
     foreground: { hex: "#0f172a", alpha: 0 },
-    warmGlow: "rgba(11, 154, 131, 0.18)",
+    warmGlow: "rgba(29, 78, 216, 0.14)",
     noiseOpacity: 0,
   },
   typography: DEFAULT_TYPOGRAPHY,

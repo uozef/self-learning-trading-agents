@@ -206,43 +206,43 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
             "shell_dollar": "#8B4513", "voice_status_bg": "#F5F0E8"},
         "spinner": {}, "branding": _HERMES_BRANDING, "tool_prefix": "┊"},
     # Built from the LiveAgents console's own CSS tokens rather than eyeballed:
-    # `--color-brand` #2ce8c4, `--color-ink` #e8edf5, `--color-panel` #0d1119,
-    # `--color-up` #29d391, `--color-down` #ff5c6c, `--color-warn` #ffb547. For a
+    # `--color-brand` #3b82f6, `--color-ink` #fafafa, `--color-void` #000000,
+    # `--color-up` #4ade80, `--color-down` #f87171, `--color-warn` #fbbf24. For a
     # dashboard framed inside that console, where gold accents read as a second
     # product's colours inside the page.
     #
     # The borders are NOT that product's `--color-line` (#1c2430). On the web it
     # separates two panels that are both lighter than it; in a terminal it sits
     # on near-black and disappears - 1.22 against the dark pole, where the
-    # palette guard asks for 2.8. A muted teal from the same family carries the
+    # palette guard asks for 2.8. A muted blue from the same family carries the
     # same intent and can actually be seen.
     "liveagents": {
-        "name": "liveagents", "description": "LiveAgents console — deep space blue and electric teal",
+        "name": "liveagents", "description": "LiveAgents console: black, with the console's blue",
         "colors": {
-            "banner_border": "#1f7a6d", "banner_title": "#2ce8c4", "banner_accent": "#14b8a6",
-            "banner_dim": "#5c6779", "banner_text": "#e8edf5", "ui_accent": "#2ce8c4",
-            "ui_label": "#14b8a6", "ui_ok": "#29d391", "ui_error": "#ff5c6c", "ui_warn": "#ffb547",
-            "prompt": "#e8edf5", "input_rule": "#1f7a6d", "response_border": "#14b8a6",
-            "status_bar_bg": "#0d1119", "status_bar_text": "#e8edf5",
-            "status_bar_strong": "#2ce8c4", "status_bar_dim": "#5c6779",
-            "status_bar_good": "#29d391", "status_bar_warn": "#ffb547", "status_bar_bad": "#ff5c6c",
-            "status_bar_critical": "#ff5c6c", "session_label": "#2ce8c4",
-            "session_border": "#1f7a6d", "completion_menu_bg": "#0d1119",
-            "completion_menu_current_bg": "#0e5850", "selection_bg": "#0e5850",
-            "shell_dollar": "#2ce8c4", "voice_status_bg": "#0d1119"},
+            "banner_border": "#41629a", "banner_title": "#3b82f6", "banner_accent": "#60a5fa",
+            "banner_dim": "#92929c", "banner_text": "#fafafa", "ui_accent": "#3b82f6",
+            "ui_label": "#60a5fa", "ui_ok": "#4ade80", "ui_error": "#f87171", "ui_warn": "#fbbf24",
+            "prompt": "#fafafa", "input_rule": "#41629a", "response_border": "#60a5fa",
+            "status_bar_bg": "#000000", "status_bar_text": "#fafafa",
+            "status_bar_strong": "#3b82f6", "status_bar_dim": "#92929c",
+            "status_bar_good": "#4ade80", "status_bar_warn": "#fbbf24", "status_bar_bad": "#f87171",
+            "status_bar_critical": "#f87171", "session_label": "#3b82f6",
+            "session_border": "#41629a", "completion_menu_bg": "#000000",
+            "completion_menu_current_bg": "#1e3a5f", "selection_bg": "#1e3a5f",
+            "shell_dollar": "#3b82f6", "voice_status_bg": "#000000"},
         "spinner": {},
-        # Rebranded, not merely recoloured. This deployment is Parabolic Agents.
+        # Rebranded, not merely recoloured: this is the LiveAgents Hermes Terminal.
         "branding": {
-            "agent_name": "Parabolic Agents",
+            "agent_name": "LiveAgents - Hermes Terminal",
             "banner_version": "1.0",
             # Both empty, deliberately: a deployment presenting itself under one
             # name should not print a second organisation's beside every model,
             # nor a tagline naming one under the other's wordmark.
             "vendor": "",
             "tagline": "",
-            "welcome": "Welcome to Parabolic Agents. Type your message or /help for commands.",
+            "welcome": "Welcome to the LiveAgents Hermes Terminal. Type your message or /help for commands.",
             "goodbye": "Goodbye.",
-            "response_label": " ∑ Parabolic ",
+            "response_label": " ∑ Hermes ",
             "prompt_symbol": "❯",
             "help_header": "(∑) Available Commands"},
         # The curve itself, small enough to be a mark rather than a diagram.
@@ -257,11 +257,11 @@ _BUILTIN_SKINS: Dict[str, Dict[str, Any]] = {
         # and wrong for the job: the banner puts this in a centred column beside
         # the tool list, and a narrow terminal wrapped the diagram's rows into
         # each other. Four rows by eleven cannot wrap.
-        "banner_hero": """[#0e5850]  ⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜[/]
-[#14b8a6]  ⠈⢧⠀⠀⠀⠀⠀⠀⠀⡼⠁[/]
-[#14b8a6]  ⠀⠈⢧⠀⠀⠀⠀⠀⡼⠁⠀[/]
-[bold #2ce8c4]  ⠀⠀⠈⠳⢄⣀⡠⠞⠁⠀⠀[/]""",
-        "banner_logo": """[bold #2ce8c4]██████╗  █████╗ ██████╗  █████╗ ██████╗  ██████╗ ██╗     ██╗ ██████╗[/]\n[bold #2ce8c4]██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔══██╗██╔═══██╗██║     ██║██╔════╝[/]\n[#14b8a6]██████╔╝███████║██████╔╝███████║██████╔╝██║   ██║██║     ██║██║     [/]\n[#14b8a6]██╔═══╝ ██╔══██║██╔══██╗██╔══██║██╔══██╗██║   ██║██║     ██║██║     [/]\n[#0e5850]██║     ██║  ██║██║  ██║██║  ██║██████╔╝╚██████╔╝███████╗██║╚██████╗[/]\n[#0e5850]╚═╝     ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚══════╝╚═╝ ╚═════╝[/]""",
+        "banner_hero": """[#1e3a5f]  ⢣⠀⠀⠀⠀⠀⠀⠀⠀⠀⡜[/]
+[#60a5fa]  ⠈⢧⠀⠀⠀⠀⠀⠀⠀⡼⠁[/]
+[#60a5fa]  ⠀⠈⢧⠀⠀⠀⠀⠀⡼⠁⠀[/]
+[bold #3b82f6]  ⠀⠀⠈⠳⢄⣀⡠⠞⠁⠀⠀[/]""",
+        "banner_logo": """[bold #3b82f6]██╗     ██╗██╗   ██╗███████╗ █████╗  ██████╗ ███████╗███╗   ██╗████████╗███████╗[/]\n[bold #3b82f6]██║     ██║██║   ██║██╔════╝██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝██╔════╝[/]\n[#60a5fa]██║     ██║██║   ██║█████╗  ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║   ███████╗[/]\n[#60a5fa]██║     ██║╚██╗ ██╔╝██╔══╝  ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║   ╚════██║[/]\n[#1e3a5f]███████╗██║ ╚████╔╝ ███████╗██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║   ███████║[/]\n[#1e3a5f]╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝   ╚══════╝[/]\n[#60a5fa]                                                   H E R M E S   T E R M I N A L[/]""",
         "tool_prefix": "┊"},
     "poseidon": {
         "name": "poseidon", "description": "Ocean-god theme — deep blue and seafoam",
